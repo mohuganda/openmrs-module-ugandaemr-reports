@@ -23,12 +23,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Set up Java 1.8 with Maven including a .m2/settings.xml file
-      - name: Set up JDK 1.8 and Maven settings file
+      # Set up Java 8 with Maven including a .m2/settings.xml file
+      - name: Set up JDK 8 and Maven settings file
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'  # Or 'zulu' if needed
-          java-version: '1.8'
+          java-version: '8.0.442+6'  # Exact available version
           server-id: openmrs-repo-snapshots
           server-username: secret_BINTRAY_USERNAME
           server-password: secret_BINTRAY_PASSWORD
