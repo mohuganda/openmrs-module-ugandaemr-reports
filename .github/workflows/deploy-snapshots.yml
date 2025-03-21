@@ -13,20 +13,22 @@ jobs:
     steps:
 
       # Check out the code
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-        # Enable caching of Maven dependencies to speed up job execution.  See https://github.com/actions/cache
-      - uses: actions/cache@v1
+      # Enable caching of Maven dependencies to speed up job execution
+      - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-        # Set up Java 1.8 with Maven including a .m2/settings.xml file.  See https://github.com/actions/setup-java
-      - name: Set up JDK 1.8 and Maven settings file
-        uses: actions/setup-java@v1
+
+      # Set up Java 8 with Maven including a .m2/settings.xml file
+      - name: Set up JDK 8 and Maven settings file
+        uses: actions/setup-java@v3
         with:
-          java-version: 1.8
+          distribution: 'temurin'  # Or 'zulu' if needed
+          java-version: '8.0.442+6'  # Exact available version
           server-id: openmrs-repo-snapshots
           server-username: secret_BINTRAY_USERNAME
           server-password: secret_BINTRAY_PASSWORD
