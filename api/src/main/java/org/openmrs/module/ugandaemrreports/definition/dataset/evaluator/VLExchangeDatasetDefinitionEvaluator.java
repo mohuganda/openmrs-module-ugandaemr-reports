@@ -155,7 +155,7 @@ public class VLExchangeDatasetDefinitionEvaluator implements DataSetEvaluator {
                 pdh.addCol(row, "Birthdate", e[1]);
                 pdh.addCol(row, "Age", e[2]);
                 pdh.addCol(row, "Sex", e[3]);
-                pdh.addCol(row, "Specimen ID", String.valueOf(e[4]));
+                pdh.addCol(row, "Specimen ID", e[4].toString());
                 pdh.addCol(row, "specimen_source", e[5]);
                 pdh.addCol(row, "Date Ordered", e[6]);
                 pdh.addCol(row, "send_request_date_sent", e[7]);
