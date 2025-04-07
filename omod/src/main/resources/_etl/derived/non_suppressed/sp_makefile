@@ -8,6 +8,12 @@ facts/facts_non_suppressed/sp_fact_encounter_non_suppressed_card_update.sql
 facts/facts_non_suppressed/sp_fact_encounter_non_suppressed_card_query.sql
 facts/facts_non_suppressed/sp_fact_encounter_non_suppressed_card.sql
 
+facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group_create.sql
+facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group_insert.sql
+facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group_update.sql
+facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group_query.sql
+facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group.sql
+
 #############################################################################
 ######## A single stored procedure that invokes (CALLs) the above SPs #######
 #############################################################################

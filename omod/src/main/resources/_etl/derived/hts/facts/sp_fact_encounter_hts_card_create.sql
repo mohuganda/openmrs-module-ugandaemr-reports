@@ -46,6 +46,23 @@ CREATE TABLE mamba_fact_encounter_hts_card
     other_prevention_services             VARCHAR(255) NULL,
     has_client_been_linked_to_care        VARCHAR(255) NULL,
     name_of_location_transferred_to       VARCHAR(255) NULL,
+    serial_number     VARCHAR(100) NULL,
+    client_at_risk_of_acquiring_hiv VARCHAR(255) NULL,
+    risk_profile          VARCHAR(255) NULL,
+    do_you_consent_for_an_hiv_test        VARCHAR(255) NULL,
+    consent_date          DATE NULL,
+    hiv_test_1_kit        VARCHAR(255) NULL,
+    hiv_test_1_kit_results        VARCHAR(255) NULL,
+    hiv_test_2_kit            VARCHAR(255) NULL,
+    hiv_test_2_kit_results        VARCHAR(255) NULL,
+    hiv_test_3_kit        VARCHAR(255) NULL,
+    hiv_test_3_kit_results            VARCHAR(255) NULL,
+    sample_sent_to_reference_laboratory   VARCHAR(255) NULL,
+    client_screened_for_tb        VARCHAR(255) NULL,
+    art_no        VARCHAR(30) NULL,
+    received_prevention_services VARCHAR(30) NULL,
+    test_name         VARCHAR(255) NULL,
+    test_date DATE NULL,
     PRIMARY KEY (id)
 ) CHARSET = UTF8;
 

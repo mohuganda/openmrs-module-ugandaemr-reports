@@ -3715,7 +3715,32 @@ SET @report_data = '{"flat_report_metadata":[{
     "test_result": "2cab2216-1aec-49d2-919b-d910bae973fb",
     "refill_point_code": "7a22cfcb-a272-4eff-968c-5e9467125a7b",
     "next_return_date_at_facility": "f6c456f7-1ab4-4b4d-a3b4-e7417c81002a",
-    "indication_for_viral_load_testing": "59f36196-3ebe-4fea-be92-6fc9551c3a11"
+    "indication_for_viral_load_testing": "59f36196-3ebe-4fea-be92-6fc9551c3a11",
+    "htn_status": "c8f00db3-abb6-46a2-89a4-25acf95be863",
+    "diabetes_mellitus_status": "126aecd6-c4de-4b1f-bfa2-8f68380f9329",
+    "anxiety_and_or_depression": "6649a671-32ea-45b7-adc5-bda1cff7febd",
+    "alcohol_and_substance_use_disorder": "10eb8116-0602-41e4-8e62-6325440dffb2",
+    "oedema": "460AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "inr_no": "b644c29c-9bb0-447e-9f73-2ae89496a709",
+    "pregnancy_status": "cd48b900-dd21-45ce-ae6b-b38ad2a3a695",
+    "lnmp": "8ed491d6-6790-4035-b729-c33ed5cb3473",
+    "anc_no.": "c7231d96-34d8-4bf7-a509-c810f75e3329",
+    "digital_health_messaging_registration": "6908508b-70c0-4b21-92d4-4fffd9458dac",
+    "cacx_screening_visit_type": "68096054-7cc0-4884-b5c8-c7ec5920fbc2",
+    "cacx_screening_method": "bd0c20f2-39a5-4d82-ad69-742e7b67e447",
+    "cacx_screening_status": "d3ac6593-b782-4ba9-9ff9-f320e59c6417",
+    "cacx_treatment": "6f1baf4c-1cdd-44a5-a48e-909391ed05f2",
+    "syphilis_status": "275a6f72-b8a4-4038-977a-727552f69cb8",
+    "tb_regimen": "16fd7307-0b26-4c8b-afa3-8362baff4042",
+    "other_tpt_status": "7913502b-68ff-4e2b-ad64-82cb3f12ee2b",
+    "hpvVacStatus": "525c11be-f4d6-4373-b09a-3fc03390ec8c",
+    "interruption_reason": "af0b99f2-4ef5-49a8-b208-e5585ba5538a",
+    "other_reason_stopped_treatment": "a7465d9a-3a01-4bae-9f33-846b119fafd5",
+    "hpv_vaccination_date": "164992AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "covidVaccStatus": "50032cf9-d5e6-4b8d-8d7d-32906d6a1115",
+    "covid_vaccination_date": "1410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "reasons_for_next_appointment": "160288AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "clinical_notes": "159395AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   }
 },{
   "report_name": "ART_Health_Education_card",
@@ -3738,7 +3763,17 @@ SET @report_data = '{"flat_report_metadata":[{
     "pss_issues_identified": "1760ea50-8f05-4675-aedd-d55f99541aa8",
     "other_linkages": "609193dc-ea2a-4746-9074-675661c025d0",
     "other_phdp_components": "ccaba007-ea6c-4dae-a3b0-07118ddf5008",
-    "gender_based_violance": "23a37400-f855-405b-9268-cb2d25b97f54"
+    "gender_based_violance": "23a37400-f855-405b-9268-cb2d25b97f54",
+    "ovc_no": "caffcc16-5a4d-4adc-a113-9a819c9b2c52",
+    "patient_categorization": "cc183c11-0f94-4992-807c-84f33095ce37",
+    "dsdm_models": "1e755463-df07-4f18-bc67-9e5527bc252f",
+    "dsdm_approach": "73312fee-c321-11e8-a355-529269fb1459",
+    "other_gmh_approach": "d42d2bab-f8a3-4bc4-8205-093d014b4215",
+    "other_imc_approach": "99d7cd10-13bd-4ad1-9947-db2c720ba99a",
+    "other_gmc_approach": "d0c7752d-edea-42df-a556-7bf5af44ffcf",
+    "other_imf_approach": "503fdc10-293e-48cd-9380-408111d2dc5b",
+    "linkages_and_referrals1": "325e4270-8b1f-447e-a591-b3daf13acea3",
+    "arrange": "5105a11e-5300-4295-9a46-3a6832d2b3dc"
   }
 },{
   "report_name": "non_suppressed_card",
@@ -3769,7 +3804,19 @@ SET @report_data = '{"flat_report_metadata":[{
     "on_fluconazole_treatment": "25a839f2-ab34-4a22-aa4d-558cdbcedc43",
     "tb_lam_test_done": "8f1ac242-b497-41eb-b140-36ba6ab2d4d4",
     "date_hivr_results_recieved_at_facility": "b913c0d9-f279-4e43-bb8e-3d1a4cf1ad4d",
-    "hivdr_results": "1c654215-fcc4-439f-a975-ced21995ed15"
+    "hivdr_results": "1c654215-fcc4-439f-a975-ced21995ed15",
+    "emtct": "dcd7e8e5-30ab-102d-86b0-7a5022ba4115",
+    "pregnant_status": "cd48b900-dd21-45ce-ae6b-b38ad2a3a695",
+    "diagnosed_with_cryptococcal_meningitis": "1f7dfe47-26a8-480d-a3db-5571cd6af3b9",
+    "treated_for_ccm": "bbf8b6ec-d0dc-4f8d-a597-b4547ee06d15",
+    "histoplasmosis_screening": "29924e7f-39c0-493b-8f0a-cb8c08e7a924",
+    "histoplasmosis_results": "aae2c3c1-5697-4ad0-9abb-99864a167d26",
+    "aspergillosis_screening": "93e9b081-96df-4248-a13a-f138d29821b1",
+    "other_clinical_decision": "163168AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "date_of_decision": "163167AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "outcome": "163170AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "other_outcome": "163171AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "comments": "163173AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   }
 },{
   "report_name": "ART_Summary_card",
@@ -3846,7 +3893,9 @@ SET @report_data = '{"flat_report_metadata":[{
     "earlier_arv_not_transfer_duration_in_months": "666afa00-2cbf-4ca0-9576-2c89a19fe466",
     "family_member_hiv_status": "1f98a7e6-4d0a-4008-a6f7-4ec118f08983",
     "family_member_hiv_test_date": "b7f597e7-39b5-419e-9ec5-de5901fffb52",
-    "hiv_enrollment_date": "31c5c7aa-4948-473e-890b-67fe2fbbd71a"
+    "hiv_enrollment_date": "31c5c7aa-4948-473e-890b-67fe2fbbd71a",
+    "relationship_to_index_clients": "bc61e60a-53ce-4767-8eed-29f3ec088829",
+    "other_relationship_to_index_client": "632b3be3-626d-4cc0-b6a5-27aeb8155314"
   }
 },{
   "report_name": "HTS_Encounter",
@@ -3894,7 +3943,24 @@ SET @report_data = '{"flat_report_metadata":[{
     "prevention_services_received": "73686a14-b55c-4b10-916d-fda2046b803f",
     "other_prevention_services": "f3419b12-f6da-4aed-a001-e9f0bd078140",
     "has_client_been_linked_to_care": "3d620422-0641-412e-ab31-5e45b98bc459",
-    "name_of_location_transferred_to": "dce015bb-30ab-102d-86b0-7a5022ba4115"
+    "name_of_location_transferred_to": "dce015bb-30ab-102d-86b0-7a5022ba4115",
+    "serial_number": "1646AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "client_at_risk_of_acquiring_hiv": "fdd25ec0-5229-4f07-9afa-2a4c14107a53",
+    "risk_profile": "69885d35-8861-4d16-a2c8-04ca380948ce",
+    "do_you_consent_for_an_hiv_test": "a69e8d5b-4b44-4392-8a49-3eaf2abffe26",
+    "consent_date": "dec56d39-01bd-474e-9021-be00f92161b8",
+    "hiv_test_1_kit": "cbbc1d9a-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_1_kit_results": "cbbc1fb6-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_2_kit": "cbbc26fa-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_2_kit_results": "cbbc2394-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_3_kit": "5140ca0a-b2c0-11ed-afa1-0242ac120002",
+    "hiv_test_3_kit_results": "cbbc2556-a7e2-11ed-afa1-0242ac120002",
+    "sample_sent_to_reference_laboratory": "11316f54-0437-449c-b698-9e2dc48daa11",
+    "client_screened_for_tb": "81fa73db-eb74-4e1b-b259-be76658cbb10",
+    "art_no": "105ef9de-ad90-4c08-bcd5-ab48f74f6287",
+    "received_prevention_services": "737dc257-643c-485a-974d-caf8b698e084",
+    "test_name": "0cf86109-82ad-4fc0-9c23-40e04ba41594",
+    "test_date": "164400AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   }
 },{
   "report_name": "TB_Enrollment",
@@ -4454,7 +4520,32 @@ SET @report_data = '{"flat_report_metadata":[{
     "test_result": "2cab2216-1aec-49d2-919b-d910bae973fb",
     "refill_point_code": "7a22cfcb-a272-4eff-968c-5e9467125a7b",
     "next_return_date_at_facility": "f6c456f7-1ab4-4b4d-a3b4-e7417c81002a",
-    "indication_for_viral_load_testing": "59f36196-3ebe-4fea-be92-6fc9551c3a11"
+    "indication_for_viral_load_testing": "59f36196-3ebe-4fea-be92-6fc9551c3a11",
+    "htn_status": "c8f00db3-abb6-46a2-89a4-25acf95be863",
+    "diabetes_mellitus_status": "126aecd6-c4de-4b1f-bfa2-8f68380f9329",
+    "anxiety_and_or_depression": "6649a671-32ea-45b7-adc5-bda1cff7febd",
+    "alcohol_and_substance_use_disorder": "10eb8116-0602-41e4-8e62-6325440dffb2",
+    "oedema": "460AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "inr_no": "b644c29c-9bb0-447e-9f73-2ae89496a709",
+    "pregnancy_status": "cd48b900-dd21-45ce-ae6b-b38ad2a3a695",
+    "lnmp": "8ed491d6-6790-4035-b729-c33ed5cb3473",
+    "anc_no.": "c7231d96-34d8-4bf7-a509-c810f75e3329",
+    "digital_health_messaging_registration": "6908508b-70c0-4b21-92d4-4fffd9458dac",
+    "cacx_screening_visit_type": "68096054-7cc0-4884-b5c8-c7ec5920fbc2",
+    "cacx_screening_method": "bd0c20f2-39a5-4d82-ad69-742e7b67e447",
+    "cacx_screening_status": "d3ac6593-b782-4ba9-9ff9-f320e59c6417",
+    "cacx_treatment": "6f1baf4c-1cdd-44a5-a48e-909391ed05f2",
+    "syphilis_status": "275a6f72-b8a4-4038-977a-727552f69cb8",
+    "tb_regimen": "16fd7307-0b26-4c8b-afa3-8362baff4042",
+    "other_tpt_status": "7913502b-68ff-4e2b-ad64-82cb3f12ee2b",
+    "hpvVacStatus": "525c11be-f4d6-4373-b09a-3fc03390ec8c",
+    "interruption_reason": "af0b99f2-4ef5-49a8-b208-e5585ba5538a",
+    "other_reason_stopped_treatment": "a7465d9a-3a01-4bae-9f33-846b119fafd5",
+    "hpv_vaccination_date": "164992AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "covidVaccStatus": "50032cf9-d5e6-4b8d-8d7d-32906d6a1115",
+    "covid_vaccination_date": "1410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "reasons_for_next_appointment": "160288AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "clinical_notes": "159395AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   }
 },{
   "report_name": "ART_Health_Education_card",
@@ -4477,7 +4568,17 @@ SET @report_data = '{"flat_report_metadata":[{
     "pss_issues_identified": "1760ea50-8f05-4675-aedd-d55f99541aa8",
     "other_linkages": "609193dc-ea2a-4746-9074-675661c025d0",
     "other_phdp_components": "ccaba007-ea6c-4dae-a3b0-07118ddf5008",
-    "gender_based_violance": "23a37400-f855-405b-9268-cb2d25b97f54"
+    "gender_based_violance": "23a37400-f855-405b-9268-cb2d25b97f54",
+    "ovc_no": "caffcc16-5a4d-4adc-a113-9a819c9b2c52",
+    "patient_categorization": "cc183c11-0f94-4992-807c-84f33095ce37",
+    "dsdm_models": "1e755463-df07-4f18-bc67-9e5527bc252f",
+    "dsdm_approach": "73312fee-c321-11e8-a355-529269fb1459",
+    "other_gmh_approach": "d42d2bab-f8a3-4bc4-8205-093d014b4215",
+    "other_imc_approach": "99d7cd10-13bd-4ad1-9947-db2c720ba99a",
+    "other_gmc_approach": "d0c7752d-edea-42df-a556-7bf5af44ffcf",
+    "other_imf_approach": "503fdc10-293e-48cd-9380-408111d2dc5b",
+    "linkages_and_referrals1": "325e4270-8b1f-447e-a591-b3daf13acea3",
+    "arrange": "5105a11e-5300-4295-9a46-3a6832d2b3dc"
   }
 },{
   "report_name": "non_suppressed_card",
@@ -4508,7 +4609,19 @@ SET @report_data = '{"flat_report_metadata":[{
     "on_fluconazole_treatment": "25a839f2-ab34-4a22-aa4d-558cdbcedc43",
     "tb_lam_test_done": "8f1ac242-b497-41eb-b140-36ba6ab2d4d4",
     "date_hivr_results_recieved_at_facility": "b913c0d9-f279-4e43-bb8e-3d1a4cf1ad4d",
-    "hivdr_results": "1c654215-fcc4-439f-a975-ced21995ed15"
+    "hivdr_results": "1c654215-fcc4-439f-a975-ced21995ed15",
+    "emtct": "dcd7e8e5-30ab-102d-86b0-7a5022ba4115",
+    "pregnant_status": "cd48b900-dd21-45ce-ae6b-b38ad2a3a695",
+    "diagnosed_with_cryptococcal_meningitis": "1f7dfe47-26a8-480d-a3db-5571cd6af3b9",
+    "treated_for_ccm": "bbf8b6ec-d0dc-4f8d-a597-b4547ee06d15",
+    "histoplasmosis_screening": "29924e7f-39c0-493b-8f0a-cb8c08e7a924",
+    "histoplasmosis_results": "aae2c3c1-5697-4ad0-9abb-99864a167d26",
+    "aspergillosis_screening": "93e9b081-96df-4248-a13a-f138d29821b1",
+    "other_clinical_decision": "163168AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "date_of_decision": "163167AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "outcome": "163170AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "other_outcome": "163171AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "comments": "163173AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   }
 },{
   "report_name": "ART_Summary_card",
@@ -4585,7 +4698,9 @@ SET @report_data = '{"flat_report_metadata":[{
     "earlier_arv_not_transfer_duration_in_months": "666afa00-2cbf-4ca0-9576-2c89a19fe466",
     "family_member_hiv_status": "1f98a7e6-4d0a-4008-a6f7-4ec118f08983",
     "family_member_hiv_test_date": "b7f597e7-39b5-419e-9ec5-de5901fffb52",
-    "hiv_enrollment_date": "31c5c7aa-4948-473e-890b-67fe2fbbd71a"
+    "hiv_enrollment_date": "31c5c7aa-4948-473e-890b-67fe2fbbd71a",
+    "relationship_to_index_clients": "bc61e60a-53ce-4767-8eed-29f3ec088829",
+    "other_relationship_to_index_client": "632b3be3-626d-4cc0-b6a5-27aeb8155314"
   }
 },{
   "report_name": "HTS_Encounter",
@@ -4633,7 +4748,24 @@ SET @report_data = '{"flat_report_metadata":[{
     "prevention_services_received": "73686a14-b55c-4b10-916d-fda2046b803f",
     "other_prevention_services": "f3419b12-f6da-4aed-a001-e9f0bd078140",
     "has_client_been_linked_to_care": "3d620422-0641-412e-ab31-5e45b98bc459",
-    "name_of_location_transferred_to": "dce015bb-30ab-102d-86b0-7a5022ba4115"
+    "name_of_location_transferred_to": "dce015bb-30ab-102d-86b0-7a5022ba4115",
+    "serial_number": "1646AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "client_at_risk_of_acquiring_hiv": "fdd25ec0-5229-4f07-9afa-2a4c14107a53",
+    "risk_profile": "69885d35-8861-4d16-a2c8-04ca380948ce",
+    "do_you_consent_for_an_hiv_test": "a69e8d5b-4b44-4392-8a49-3eaf2abffe26",
+    "consent_date": "dec56d39-01bd-474e-9021-be00f92161b8",
+    "hiv_test_1_kit": "cbbc1d9a-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_1_kit_results": "cbbc1fb6-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_2_kit": "cbbc26fa-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_2_kit_results": "cbbc2394-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_3_kit": "5140ca0a-b2c0-11ed-afa1-0242ac120002",
+    "hiv_test_3_kit_results": "cbbc2556-a7e2-11ed-afa1-0242ac120002",
+    "sample_sent_to_reference_laboratory": "11316f54-0437-449c-b698-9e2dc48daa11",
+    "client_screened_for_tb": "81fa73db-eb74-4e1b-b259-be76658cbb10",
+    "art_no": "105ef9de-ad90-4c08-bcd5-ab48f74f6287",
+    "received_prevention_services": "737dc257-643c-485a-974d-caf8b698e084",
+    "test_name": "0cf86109-82ad-4fc0-9c23-40e04ba41594",
+    "test_date": "164400AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   }
 },{
   "report_name": "TB_Enrollment",
@@ -13653,6 +13785,7 @@ END;
 
 -- $BEGIN
 CALL sp_fact_encounter_non_suppressed_card;
+CALL sp_fact_encounter_non_suppressed_obs_group;
 -- $END
 END;
 ~-~-
@@ -13910,6 +14043,178 @@ END;
 
         
 -- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_obs_group  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_obs_group;
+
+
+~-~-
+CREATE PROCEDURE sp_mamba_obs_group()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_mamba_obs_group', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_mamba_obs_group', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+
+CALL sp_mamba_obs_group_create();
+CALL sp_mamba_obs_group_insert();
+CALL sp_mamba_obs_group_update();
+
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_obs_group_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_obs_group_create;
+
+
+~-~-
+CREATE PROCEDURE sp_mamba_obs_group_create()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_mamba_obs_group_create', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_mamba_obs_group_create', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+
+CREATE TABLE mamba_obs_group
+(
+    id                     INT          NOT NULL AUTO_INCREMENT UNIQUE PRIMARY KEY,
+    obs_id                 INT          NOT NULL,
+    obs_group_concept_id   INT          NOT NULL,
+    obs_group_concept_name VARCHAR(255) NOT NULL, -- should be the concept name of the obs
+
+    INDEX mamba_idx_obs_id (obs_id),
+    INDEX mamba_idx_obs_group_concept_id (obs_group_concept_id),
+    INDEX mamba_idx_obs_group_concept_name (obs_group_concept_name)
+)
+    CHARSET = UTF8MB4;
+
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_obs_group_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_obs_group_insert;
+
+
+~-~-
+CREATE PROCEDURE sp_mamba_obs_group_insert()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_mamba_obs_group_insert', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_mamba_obs_group_insert', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CALL sp_fact_encounter_non_suppressed_card_update();
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_obs_group_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_obs_group_update;
+
+
+~-~-
+CREATE PROCEDURE sp_mamba_obs_group_update()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_mamba_obs_group_update', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_mamba_obs_group_update', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_mamba_data_processing_etl  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -13944,7 +14249,6 @@ END;
 -- add base folder SP here --
 -- CALL sp_data_processing_derived_hts();
 
-CALL sp_mamba_data_processing_flatten();
 CALL sp_data_processing_derived_transfers();
 CALL sp_data_processing_derived_non_suppressed();
 CALL sp_data_processing_derived_hiv_art_card();
@@ -15287,6 +15591,31 @@ CREATE TABLE mamba_fact_encounter_hiv_art_card
     refill_point_code                     TEXT NULL,
     next_return_date_at_facility          DATE NULL,
     indication_for_viral_load_testing     VARCHAR(255) NULL,
+    htn_status    VARCHAR(250) NULL,
+    diabetes_mellitus_status       VARCHAR(250) NULL,
+    anxiety_and_or_depression      VARCHAR(250) NULL,
+    alcohol_and_substance_use_disorder         VARCHAR(250) NULL,
+    oedema VARCHAR(250) NULL,
+    inr_no  VARCHAR(50) NULL,
+    pregnancy_status       VARCHAR(100) NULL,
+    lnmp DATE NULL,
+    anc_no VARCHAR(50) NULL,
+    digital_health_messaging_registration VARCHAR(250) NULL,
+    cacx_screening_visit_type         VARCHAR(250) NULL,
+    cacx_screening_method             VARCHAR(250) NULL,
+    cacx_screening_status             VARCHAR(250) NULL,
+    cacx_treatment            VARCHAR(250) NULL,
+    syphilis_status           VARCHAR(250) NULL,
+    tb_regimen    VARCHAR(255) NULL,
+    other_tpt_status       VARCHAR(255) NULL,
+    hpvVacStatus   VARCHAR(255) NULL,
+    interruption_reason VARCHAR(255) NULL,
+    other_reason_stopped_treatment VARCHAR(255) NULL,
+    hpv_vaccination_date  DATE NULL,
+    covidVaccStatus  VARCHAR(255) NULL,
+    covid_vaccination_date DATE NULL,
+    reasons_for_next_appointment VARCHAR(255) NULL,
+    clinical_notes TEXT,
 
     PRIMARY KEY (id)
 )
@@ -15410,10 +15739,32 @@ INSERT INTO mamba_fact_encounter_hiv_art_card (encounter_id,
                                                test_result,
                                                refill_point_code,
                                                next_return_date_at_facility,
-                                               indication_for_viral_load_testing)
-SELECT encounter_id,
-       client_id,
-       encounter_datetime,
+                                               indication_for_viral_load_testing,
+                                               htn_status    ,
+                                               diabetes_mellitus_status,
+                                               anxiety_and_or_depression,
+                                               alcohol_and_substance_use_disorder,
+                                               oedema ,
+                                               inr_no,
+                                               pregnancy_status,
+                                               digital_health_messaging_registration ,
+                                               cacx_screening_visit_type         ,
+                                               cacx_screening_method,
+                                               cacx_screening_status,
+                                               cacx_treatment,
+                                               syphilis_status,
+                                               tb_regimen,
+                                               other_tpt_status,
+                                               hpvVacStatus,
+                                               interruption_reason,
+                                               hpv_vaccination_date,
+                                               covidVaccStatus,
+                                               covid_vaccination_date,
+                                               reasons_for_next_appointment,
+                                               clinical_notes )
+SELECT a.encounter_id,
+       a.client_id,
+       a.encounter_datetime,
        method_of_family_planning,
        cd4,
        hiv_viral_load,
@@ -15483,8 +15834,30 @@ SELECT encounter_id,
        test_result,
        refill_point_code,
        next_return_date_at_facility,
-       indication_for_viral_load_testing
-FROM mamba_flat_encounter_art_card where encounter_datetime >= DATE_SUB(CURRENT_DATE(),INTERVAL 10 YEAR) ;
+       indication_for_viral_load_testing,
+       htn_status    ,
+       diabetes_mellitus_status,
+       anxiety_and_or_depression,
+       alcohol_and_substance_use_disorder,
+       oedema ,
+       inr_no,
+       pregnancy_status,
+       digital_health_messaging_registration ,
+       cacx_screening_visit_type         ,
+       cacx_screening_method,
+       cacx_screening_status,
+       cacx_treatment,
+       syphilis_status,
+       tb_regimen,
+       other_tpt_status,
+       hpvVacStatus,
+       interruption_reason,
+       hpv_vaccination_date,
+       covidVaccStatus,
+       covid_vaccination_date,
+       reasons_for_next_appointment,
+       clinical_notes
+FROM mamba_flat_encounter_art_card a inner join mamba_flat_encounter_art_card_1 b on a.encounter_id=b.encounter_id ;
 -- $END
 END;
 ~-~-
@@ -15697,6 +16070,8 @@ CREATE TABLE mamba_fact_encounter_hiv_art_summary
     family_member_hiv_status                    VARCHAR(255) NULL,
     family_member_hiv_test_date                 DATE NULL,
     hiv_enrollment_date                         DATE NULL,
+    relationship_to_index_clients             VARCHAR(255) NULL,
+    other_relationship_to_index_client        VARCHAR(255) NULL,
 
     PRIMARY KEY (id)
 ) CHARSET = UTF8;
@@ -15821,10 +16196,12 @@ INSERT INTO mamba_fact_encounter_hiv_art_summary (encounter_id,
                                                   earlier_arv_not_transfer_duration_in_months,
                                                   family_member_hiv_status,
                                                   family_member_hiv_test_date,
-                                                  hiv_enrollment_date)
-SELECT encounter_id,
-       client_id,
-       encounter_datetime,
+                                                  hiv_enrollment_date,
+                                                  relationship_to_index_clients,
+                                                  other_relationship_to_index_client)
+SELECT a.encounter_id,
+       a.client_id,
+       a.encounter_datetime,
        allergy,
        hepatitis_b_test_qualitative,
        hepatitis_c_test_qualitative,
@@ -15894,8 +16271,10 @@ SELECT encounter_id,
        earlier_arv_not_transfer_duration_in_months,
        family_member_hiv_status,
        family_member_hiv_test_date,
-       hiv_enrollment_date
-FROM mamba_flat_encounter_art_summary_card;
+       hiv_enrollment_date,
+       relationship_to_index_clients,
+       other_relationship_to_index_client
+FROM mamba_flat_encounter_art_summary_card a left join mamba_flat_encounter_art_summary_card_1 b on a.encounter_id = b.encounter_id ;
 -- $END
 END;
 ~-~-
@@ -16054,6 +16433,16 @@ CREATE TABLE mamba_fact_encounter_hiv_art_health_education
     health_education_setting    VARCHAR(255)  DEFAULT NULL,
     clinical_impression_comment TEXT  DEFAULT NULL,
     health_education_disclosure VARCHAR(255)  DEFAULT NULL,
+    ovc_no         VARCHAR(100)  DEFAULT NULL,
+    patient_categorization VARCHAR(255)  DEFAULT NULL,
+    dsdm_models       VARCHAR(255)  DEFAULT NULL,
+    dsdm_approach     VARCHAR(255)  DEFAULT NULL,
+    other_gmh_approach    VARCHAR(255)  DEFAULT NULL,
+    other_imc_approach    VARCHAR(255)  DEFAULT NULL,
+    other_gmc_approach    VARCHAR(255)  DEFAULT NULL,
+    other_imf_approach    VARCHAR(255)  DEFAULT NULL,
+    linkages_and_referrals1    VARCHAR(255)  DEFAULT NULL,
+    arrange   VARCHAR(255)  DEFAULT NULL,
 
     PRIMARY KEY (id)
 ) CHARSET = UTF8;
@@ -16122,7 +16511,17 @@ INSERT INTO mamba_fact_encounter_hiv_art_health_education (encounter_id,
                                                        scheduled_patient_visit,
                                                        health_education_setting,
                                                        clinical_impression_comment,
-                                                       health_education_disclosure)
+                                                       health_education_disclosure,
+                                                           ovc_no        ,
+                                                           patient_categorization,
+                                                           dsdm_models       ,
+                                                           dsdm_approach     ,
+                                                           other_gmh_approach   ,
+                                                           other_imc_approach   ,
+                                                           other_gmc_approach    ,
+                                                           other_imf_approach    ,
+                                                           linkages_and_referrals1   ,
+                                                           arrange   )
 SELECT encounter_id,
        client_id,
        encounter_datetime,
@@ -16141,7 +16540,17 @@ SELECT encounter_id,
        scheduled_patient_visit,
        health_education_setting,
        clinical_impression_comment,
-       health_education_disclosure
+       health_education_disclosure,
+       ovc_no        ,
+       patient_categorization,
+       dsdm_models       ,
+       dsdm_approach     ,
+       other_gmh_approach   ,
+       other_imc_approach   ,
+       other_gmc_approach    ,
+       other_imf_approach    ,
+       linkages_and_referrals1   ,
+       arrange
 
 
 FROM mamba_flat_encounter_art_health_education;
@@ -24042,6 +24451,23 @@ CREATE TABLE mamba_fact_encounter_hts_card
     other_prevention_services             VARCHAR(255) NULL,
     has_client_been_linked_to_care        VARCHAR(255) NULL,
     name_of_location_transferred_to       VARCHAR(255) NULL,
+    serial_number     VARCHAR(100) NULL,
+    client_at_risk_of_acquiring_hiv VARCHAR(255) NULL,
+    risk_profile          VARCHAR(255) NULL,
+    do_you_consent_for_an_hiv_test        VARCHAR(255) NULL,
+    consent_date          DATE NULL,
+    hiv_test_1_kit        VARCHAR(255) NULL,
+    hiv_test_1_kit_results        VARCHAR(255) NULL,
+    hiv_test_2_kit            VARCHAR(255) NULL,
+    hiv_test_2_kit_results        VARCHAR(255) NULL,
+    hiv_test_3_kit        VARCHAR(255) NULL,
+    hiv_test_3_kit_results            VARCHAR(255) NULL,
+    sample_sent_to_reference_laboratory   VARCHAR(255) NULL,
+    client_screened_for_tb        VARCHAR(255) NULL,
+    art_no        VARCHAR(30) NULL,
+    received_prevention_services VARCHAR(30) NULL,
+    test_name         VARCHAR(255) NULL,
+    test_date DATE NULL,
     PRIMARY KEY (id)
 ) CHARSET = UTF8;
 
@@ -24111,10 +24537,27 @@ INSERT INTO mamba_fact_encounter_hts_card (encounter_id,
                                            results_received_as_individual, results_received_as_a_couple,
                                            couple_results, tb_suspect, presumptive_tb_case_referred,
                                            prevention_services_received, other_prevention_services,
-                                           has_client_been_linked_to_care, name_of_location_transferred_to)
-SELECT encounter_id,
-       client_id,
-       encounter_datetime,
+                                           has_client_been_linked_to_care, name_of_location_transferred_to,
+                                           serial_number     ,
+                                           client_at_risk_of_acquiring_hiv ,
+                                           risk_profile          ,
+                                           do_you_consent_for_an_hiv_test ,
+                                           consent_date          ,
+                                           hiv_test_1_kit        ,
+                                           hiv_test_1_kit_results       ,
+                                           hiv_test_2_kit           ,
+                                           hiv_test_2_kit_results        ,
+                                           hiv_test_3_kit       ,
+                                           hiv_test_3_kit_results            ,
+                                           sample_sent_to_reference_laboratory   ,
+                                           client_screened_for_tb       ,
+                                           art_no        ,
+                                           received_prevention_services ,
+                                           test_name        ,
+                                           test_date )
+SELECT a.encounter_id,
+    a.client_id,
+    a.encounter_datetime,
        family_member_accompanying_patient,
        other_specified_family_member,
        delivery_model,
@@ -24154,10 +24597,26 @@ SELECT encounter_id,
        prevention_services_received,
        other_prevention_services,
        has_client_been_linked_to_care,
-       name_of_location_transferred_to
+       name_of_location_transferred_to,
+       serial_number     ,
+       client_at_risk_of_acquiring_hiv ,
+       risk_profile          ,
+       do_you_consent_for_an_hiv_test ,
+       consent_date          ,
+       hiv_test_1_kit        ,
+       hiv_test_1_kit_results       ,
+       hiv_test_2_kit           ,
+       hiv_test_2_kit_results        ,
+       hiv_test_3_kit       ,
+       hiv_test_3_kit_results            ,
+       sample_sent_to_reference_laboratory   ,
+       client_screened_for_tb       ,
+       art_no        ,
+       received_prevention_services ,
+       test_name        ,
+       test_date
 
-FROM mamba_flat_encounter_hts_card
-where encounter_datetime >= DATE_SUB(CURRENT_DATE(), INTERVAL 5 YEAR);
+FROM mamba_flat_encounter_hts_card a left join mamba_flat_encounter_hts_card_1 b on a.encounter_id = b.encounter_id;
 -- $END
 END;
 ~-~-
@@ -24313,6 +24772,18 @@ CREATE TABLE mamba_fact_encounter_non_suppressed_card
     tb_lam_test_done                       VARCHAR(80) NULL,
     date_hivr_results_recieved_at_facility DATE NULL,
     hivdr_results                          TEXT NULL,
+    emtct                      VARCHAR(80) NULL,
+    pregnant_status               VARCHAR(100) NULL,
+    diagnosed_with_cryptococcal_meningitis    VARCHAR(100) NULL,
+    treated_for_ccm       VARCHAR(30) NULL,
+    histoplasmosis_screening  VARCHAR(80) NULL,
+    histoplasmosis_results    VARCHAR(255) NULL,
+    aspergillosis_screening       VARCHAR(80) NULL,
+    other_clinical_decision          VARCHAR(80) NULL,
+    date_of_decision          DATE NULL,
+    outcome                   VARCHAR(100) NULL,
+    other_outcome              TEXT,
+    comments                  TEXT,
         PRIMARY KEY (id)
 ) CHARSET = UTF8;
 
@@ -24366,7 +24837,19 @@ INSERT INTO mamba_fact_encounter_non_suppressed_card (encounter_id,
                                                       hivdr_sample_collected, tb_lam_results, date_cd4_sample_collected,
                                                       date_of_vl_sample_collection, on_fluconazole_treatment,
                                                       tb_lam_test_done, date_hivr_results_recieved_at_facility,
-                                                      hivdr_results)
+                                                      hivdr_results,
+                                                      emtct                      ,
+                                                      pregnant_status               ,
+                                                      diagnosed_with_cryptococcal_meningitis   ,
+                                                      treated_for_ccm      ,
+                                                      histoplasmosis_screening  ,
+                                                      histoplasmosis_results   ,
+                                                      aspergillosis_screening       ,
+                                                      other_clinical_decision          ,
+                                                      date_of_decision          ,
+                                                      outcome                  ,
+                                                      other_outcome            ,
+                                                      comments )
 SELECT encounter_id,
        client_id,
        encounter_datetime,
@@ -24393,7 +24876,19 @@ SELECT encounter_id,
        on_fluconazole_treatment,
        tb_lam_test_done,
        date_hivr_results_recieved_at_facility,
-       hivdr_results
+       hivdr_results,
+       emtct                      ,
+       pregnant_status               ,
+       diagnosed_with_cryptococcal_meningitis   ,
+       treated_for_ccm      ,
+       histoplasmosis_screening  ,
+       histoplasmosis_results   ,
+       aspergillosis_screening       ,
+       other_clinical_decision          ,
+       date_of_decision          ,
+       outcome                  ,
+       other_outcome            ,
+       comments
 
 FROM mamba_flat_encounter_non_suppressed;
 -- $END
@@ -24501,6 +24996,218 @@ END;
 
         
 -- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_obs_group_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_obs_group_create;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_obs_group_create()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_obs_group_create', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_obs_group_create', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CREATE TABLE mamba_fact_non_suppressed_obs_group
+(
+    id                   INT AUTO_INCREMENT,
+    client_id            INT  NULL,
+    encounter_id           INT NULL,
+    obs_group_id            INT NULL,
+    obs_datetime            DATETIME NULL,
+    session_date            DATE NULL,
+    adherence_code                   VARCHAR(250) NULL,
+    score                   INT NULL,
+    PRIMARY KEY (id)
+) CHARSET = UTF8;
+
+CREATE INDEX
+    mamba_fact_non_suppressed_obs_group_client_id_index ON mamba_fact_non_suppressed_obs_group (client_id);
+CREATE INDEX
+    mamba_fact_non_suppressed_obs_group_encounter_id_index ON mamba_fact_non_suppressed_obs_group (encounter_id);
+CREATE INDEX
+    mamba_fact_non_suppressed_obs_group_obs_group_id_index ON mamba_fact_non_suppressed_obs_group (obs_group_id);
+
+
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_obs_group_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_obs_group_insert;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_obs_group_insert()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_obs_group_insert', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_obs_group_insert', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+INSERT INTO mamba_fact_non_suppressed_obs_group (encounter_id,
+                                               client_id,
+                                                 obs_datetime,
+                                                 obs_group_id,
+                                                 session_date,
+                                                 adherence_code,
+                                                 score )
+SELECT
+    og.encounter_id,
+    og.person_id,
+    og.obs_datetime,
+    og.obs_id AS obs_group_id,
+
+    MAX(CASE WHEN o.concept_id = 163154 THEN o.value_datetime END) AS session_date,
+    MAX(CASE WHEN o.concept_id = 90221 THEN cn.name END) AS adherence_code,
+    MAX(CASE WHEN o.concept_id = 163155 THEN o.value_numeric END) AS score
+
+FROM
+    obs og
+        LEFT JOIN obs o ON o.obs_group_id = og.obs_id AND o.voided = 0
+        LEFT JOIN concept_name cn
+                  ON o.value_coded = cn.concept_id AND cn.locale = 'en' AND cn.voided = 0 and cn.concept_name_type='FULLY_SPECIFIED'
+WHERE
+    og.concept_id = 163153
+
+  AND og.voided = 0
+GROUP BY
+    og.obs_id, og.encounter_id, og.person_id, og.obs_datetime;
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_obs_group_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_obs_group_update;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_obs_group_update()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_obs_group_update', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_obs_group_update', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_obs_group_query  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_obs_group  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_obs_group;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_obs_group()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_obs_group', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_obs_group', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CALL sp_fact_encounter_non_suppressed_obs_group_create();
+CALL sp_fact_encounter_non_suppressed_obs_group_insert();
+CALL sp_fact_encounter_non_suppressed_obs_group_update();
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_data_processing_derived_non_suppressed  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -24533,6 +25240,7 @@ END;
 
 -- $BEGIN
 CALL sp_fact_encounter_non_suppressed_card;
+CALL sp_fact_encounter_non_suppressed_obs_group;
 -- $END
 END;
 ~-~-

@@ -44,6 +44,23 @@
     "prevention_services_received": "73686a14-b55c-4b10-916d-fda2046b803f",
     "other_prevention_services": "f3419b12-f6da-4aed-a001-e9f0bd078140",
     "has_client_been_linked_to_care": "3d620422-0641-412e-ab31-5e45b98bc459",
-    "name_of_location_transferred_to": "dce015bb-30ab-102d-86b0-7a5022ba4115"
+    "name_of_location_transferred_to": "dce015bb-30ab-102d-86b0-7a5022ba4115",
+    "serial_number": "1646AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "client_at_risk_of_acquiring_hiv": "fdd25ec0-5229-4f07-9afa-2a4c14107a53",
+    "risk_profile": "69885d35-8861-4d16-a2c8-04ca380948ce",
+    "do_you_consent_for_an_hiv_test": "a69e8d5b-4b44-4392-8a49-3eaf2abffe26",
+    "consent_date": "dec56d39-01bd-474e-9021-be00f92161b8",
+    "hiv_test_1_kit": "cbbc1d9a-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_1_kit_results": "cbbc1fb6-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_2_kit": "cbbc26fa-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_2_kit_results": "cbbc2394-a7e2-11ed-afa1-0242ac120002",
+    "hiv_test_3_kit": "5140ca0a-b2c0-11ed-afa1-0242ac120002",
+    "hiv_test_3_kit_results": "cbbc2556-a7e2-11ed-afa1-0242ac120002",
+    "sample_sent_to_reference_laboratory": "11316f54-0437-449c-b698-9e2dc48daa11",
+    "client_screened_for_tb": "81fa73db-eb74-4e1b-b259-be76658cbb10",
+    "art_no": "105ef9de-ad90-4c08-bcd5-ab48f74f6287",
+    "received_prevention_services": "737dc257-643c-485a-974d-caf8b698e084",
+    "test_name": "0cf86109-82ad-4fc0-9c23-40e04ba41594",
+    "test_date": "164400AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   }
 }
