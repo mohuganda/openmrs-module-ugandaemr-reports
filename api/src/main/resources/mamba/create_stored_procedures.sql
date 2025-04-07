@@ -13110,15 +13110,24 @@ DELIMITER //
 
 CREATE PROCEDURE sp_mamba_z_encounter_obs_update()
 BEGIN
-    DECLARE total_records INT;
-    DECLARE batch_size INT DEFAULT 1000000; -- 1 million batches
-    DECLARE mamba_offset INT DEFAULT 0;
+    DECLARE v_total_records INT;
+    DECLARE v_batch_size INT DEFAULT 100000; -- batch size
+    DECLARE v_offset INT DEFAULT 0;
+    DECLARE v_rows_affected INT;
+    
+    -- Use a transaction for better error handling and atomicity
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        DROP TEMPORARY TABLE IF EXISTS mamba_temp_value_coded_values;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'An error occurred during the update process';
+    END;
+    
+    START TRANSACTION;
 
-    SELECT COUNT(*)
-    INTO total_records
-    FROM mamba_z_encounter_obs;
-    CREATE
-        TEMPORARY TABLE mamba_temp_value_coded_values
+    -- Create temporary table with only the needed values
+    -- This reduces memory usage and improves join performance
+    CREATE TEMPORARY TABLE mamba_temp_value_coded_values
         CHARSET = UTF8MB4 AS
     SELECT m.concept_id AS concept_id,
            m.uuid       AS concept_uuid,
@@ -13127,28 +13136,41 @@ BEGIN
     WHERE concept_id in (SELECT DISTINCT obs_value_coded
                          FROM mamba_z_encounter_obs
                          WHERE obs_value_coded IS NOT NULL);
-
+                         
+    -- Create index to optimize joins
     CREATE INDEX mamba_idx_concept_id ON mamba_temp_value_coded_values (concept_id);
 
-    -- update obs_value_coded (UUIDs & Concept value names)
-    WHILE mamba_offset < total_records
-        DO
-            UPDATE mamba_z_encounter_obs z
-                JOIN (SELECT encounter_id
-                      FROM mamba_z_encounter_obs
-                      ORDER BY encounter_id
-                      LIMIT batch_size OFFSET mamba_offset) AS filter
-                ON filter.encounter_id = z.encounter_id
-                INNER JOIN mamba_temp_value_coded_values mtv
-                ON z.obs_value_coded = mtv.concept_id
-            SET z.obs_value_text       = mtv.concept_name,
-                z.obs_value_coded_uuid = mtv.concept_uuid
-            WHERE z.obs_value_coded IS NOT NULL;
+    -- Get total count for batch processing
+    SELECT COUNT(*)
+    INTO v_total_records
+    FROM mamba_z_encounter_obs z
+             INNER JOIN mamba_temp_value_coded_values mtv
+                        ON z.obs_value_coded = mtv.concept_id
+    WHERE z.obs_value_coded IS NOT NULL;
 
-            SET mamba_offset = mamba_offset + batch_size;
-        END WHILE;
+    -- Process records in batches to optimize memory usage
+    WHILE v_offset < v_total_records DO
+        -- Update in batches using dynamic SQL
+        SET @sql = CONCAT('UPDATE mamba_z_encounter_obs z
+                    INNER JOIN (
+                        SELECT concept_id, concept_name, concept_uuid
+                        FROM mamba_temp_value_coded_values mtv
+                        LIMIT ', v_batch_size, ' OFFSET ', v_offset, '
+                    ) AS mtv
+                    ON z.obs_value_coded = mtv.concept_id
+                    SET z.obs_value_text = mtv.concept_name,
+                        z.obs_value_coded_uuid = mtv.concept_uuid
+                    WHERE z.obs_value_coded IS NOT NULL');
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        SET v_rows_affected = ROW_COUNT();
+        DEALLOCATE PREPARE stmt;
 
-    -- update column obs_value_boolean (Concept values)
+        -- Adaptively adjust offset based on actual rows affected
+        SET v_offset = v_offset + IF(v_rows_affected > 0, v_rows_affected, v_batch_size);
+    END WHILE;
+
+    -- Update boolean values based on text representations
     UPDATE mamba_z_encounter_obs z
     SET obs_value_boolean =
             CASE
@@ -13162,6 +13184,9 @@ BEGIN
            FROM mamba_dim_concept c
            WHERE c.datatype = 'Boolean');
 
+    COMMIT;
+    
+    -- Clean up temporary resources
     DROP TEMPORARY TABLE IF EXISTS mamba_temp_value_coded_values;
 
 END //
@@ -14040,6 +14065,134 @@ FROM concept_name cn
 END //
 
 DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_z_encounter_obs_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_z_encounter_obs_insert;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_mamba_z_encounter_obs_insert()
+BEGIN
+    DECLARE batch_size INT DEFAULT 1000000; -- 1m batch size
+    DECLARE batch_last_obs_id INT DEFAULT 0;
+    DECLARE last_obs_id INT;
+
+    CREATE TEMPORARY TABLE IF NOT EXISTS mamba_temp_obs_data AS
+    SELECT o.obs_id,
+           o.encounter_id,
+           e.visit_id,
+           o.person_id,
+           o.order_id,
+           e.encounter_datetime,
+           o.obs_datetime,
+           o.location_id,
+           o.obs_group_id,
+           o.concept_id     AS obs_question_concept_id,
+           o.value_text     AS obs_value_text,
+           o.value_numeric  AS obs_value_numeric,
+           o.value_coded    AS obs_value_coded,
+           o.value_datetime AS obs_value_datetime,
+           o.value_complex  AS obs_value_complex,
+           o.value_drug     AS obs_value_drug,
+           md.concept_uuid  AS obs_question_uuid,
+           NULL             AS obs_answer_uuid,
+           NULL             AS obs_value_coded_uuid,
+           e.encounter_type_uuid,
+           o.status,
+           o.previous_version,
+           o.date_created,
+           o.date_voided,
+           o.voided,
+           o.voided_by,
+           o.void_reason
+    FROM kisenyi.obs o
+             INNER JOIN mamba_dim_encounter e ON o.encounter_id = e.encounter_id
+             INNER JOIN (SELECT DISTINCT concept_id, concept_uuid
+                         FROM mamba_concept_metadata) md ON o.concept_id = md.concept_id
+    WHERE o.encounter_id IS NOT NULL and e.encounter_datetime >=DATE_SUB(CURRENT_DATE(), INTERVAL 8 YEAR);
+
+    CREATE INDEX idx_obs_id ON mamba_temp_obs_data (obs_id);
+
+    SELECT MAX(obs_id) INTO last_obs_id FROM mamba_temp_obs_data;
+
+    WHILE batch_last_obs_id < last_obs_id
+        DO
+            INSERT INTO mamba_z_encounter_obs (obs_id,
+                                               encounter_id,
+                                               visit_id,
+                                               person_id,
+                                               order_id,
+                                               encounter_datetime,
+                                               obs_datetime,
+                                               location_id,
+                                               obs_group_id,
+                                               obs_question_concept_id,
+                                               obs_value_text,
+                                               obs_value_numeric,
+                                               obs_value_coded,
+                                               obs_value_datetime,
+                                               obs_value_complex,
+                                               obs_value_drug,
+                                               obs_question_uuid,
+                                               obs_answer_uuid,
+                                               obs_value_coded_uuid,
+                                               encounter_type_uuid,
+                                               status,
+                                               previous_version,
+                                               date_created,
+                                               date_voided,
+                                               voided,
+                                               voided_by,
+                                               void_reason)
+            SELECT obs_id,
+                   encounter_id,
+                   visit_id,
+                   person_id,
+                   order_id,
+                   encounter_datetime,
+                   obs_datetime,
+                   location_id,
+                   obs_group_id,
+                   obs_question_concept_id,
+                   obs_value_text,
+                   obs_value_numeric,
+                   obs_value_coded,
+                   obs_value_datetime,
+                   obs_value_complex,
+                   obs_value_drug,
+                   obs_question_uuid,
+                   obs_answer_uuid,
+                   obs_value_coded_uuid,
+                   encounter_type_uuid,
+                   status,
+                   previous_version,
+                   date_created,
+                   date_voided,
+                   voided,
+                   voided_by,
+                   void_reason
+            FROM mamba_temp_obs_data
+            WHERE obs_id > batch_last_obs_id
+            ORDER BY obs_id ASC
+            LIMIT batch_size;
+
+            SELECT MAX(obs_id)
+            INTO batch_last_obs_id
+            FROM mamba_z_encounter_obs
+            LIMIT 1;
+
+        END WHILE;
+
+    DROP TEMPORARY TABLE IF EXISTS mamba_temp_obs_data;
+
+END //
+
+DELIMITER ;
+
 
         
 -- ---------------------------------------------------------------------------------------------
