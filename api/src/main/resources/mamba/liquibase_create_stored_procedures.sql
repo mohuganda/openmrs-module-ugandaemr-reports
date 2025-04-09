@@ -1079,6 +1079,8 @@ BEGIN
     DECLARE time_taken BIGINT;
     DECLARE etl_is_ready_to_run BOOLEAN DEFAULT FALSE;
 
+    -- cleanup stuck schedule
+    CALL sp_mamba_etl_un_stuck_scheduler();
     -- check if _mamba_etl_schedule is empty(new) or last transaction_status
     -- is 'COMPLETED' AND it was a 'SUCCESS' AND its 'end_time' was set.
     SET etl_is_ready_to_run = (SELECT COALESCE(
@@ -1168,6 +1170,49 @@ BEGIN
                            LIMIT 20
                        ) AS recent_records
     );
+
+END //
+
+DELIMITER ;
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_etl_un_stuck_scheduler  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_etl_un_stuck_scheduler;
+
+DELIMITER //
+
+~
+CREATE PROCEDURE sp_mamba_etl_un_stuck_scheduler()
+BEGIN
+
+    DECLARE running_schedule_record BOOLEAN DEFAULT FALSE;
+    DECLARE no_running_mamba_sp BOOLEAN DEFAULT FALSE;
+    DECLARE last_schedule_record_id INT;
+
+    SET running_schedule_record = (SELECT COALESCE(
+                                                  (SELECT IF(transaction_status = 'RUNNING'
+                                                                 AND completion_status is null,
+                                                             TRUE, FALSE)
+                                                   FROM _mamba_etl_schedule
+                                                   ORDER BY id DESC
+                                                   LIMIT 1), TRUE));
+    SET no_running_mamba_sp = NOT EXISTS (SELECT 1
+                                          FROM performance_schema.events_statements_current
+                                          WHERE SQL_TEXT LIKE 'CALL sp_mamba_etl_scheduler_wrapper(%'
+                                             OR SQL_TEXT = 'CALL sp_mamba_etl_scheduler_wrapper()');
+    IF running_schedule_record AND no_running_mamba_sp THEN
+        SET last_schedule_record_id = (SELECT MAX(id) FROM _mamba_etl_schedule limit 1);
+        UPDATE _mamba_etl_schedule
+        SET end_time                   = NOW(),
+            completion_status          = 'SUCCESS',
+            transaction_status         = 'COMPLETED',
+            success_or_error_message   = 'Stuck schedule updated'
+            WHERE id = last_schedule_record_id;
+    END IF;
 
 END //
 
@@ -13347,7 +13392,7 @@ DELIMITER //
 CREATE PROCEDURE sp_mamba_z_encounter_obs_update()
 BEGIN
     DECLARE v_total_records INT;
-    DECLARE v_batch_size INT DEFAULT 100000; -- batch size
+    DECLARE v_batch_size INT DEFAULT 1000000; -- batch size
     DECLARE v_offset INT DEFAULT 0;
     DECLARE v_rows_affected INT;
     
@@ -13985,6 +14030,7 @@ CALL sp_fact_encounter_hiv_art_card;
 CALL sp_fact_encounter_hiv_art_summary;
 CALL sp_fact_encounter_hiv_art_health_education;
 CALL sp_fact_active_in_care;
+CALL sp_fact_medication_orders;
 CALL sp_fact_latest_adherence_patients;
 CALL sp_fact_latest_advanced_disease_patients;
 CALL sp_fact_latest_arv_days_dispensed_patients;
@@ -14015,6 +14061,7 @@ CALL sp_fact_current_arv_regimen_start_date;
 CALL sp_fact_latest_pregnancy_status_patients;
 CALL sp_fact_calhiv_patients;
 CALL sp_fact_eid_patients;
+
 
 -- $END
 END //
@@ -24207,6 +24254,252 @@ DELIMITER ;
 
         
 -- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_medication_orders_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_medication_orders_create;
+
+DELIMITER //
+
+~
+CREATE PROCEDURE sp_fact_medication_orders_create()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_medication_orders_create', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_medication_orders_create', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CREATE TABLE mamba_fact_medication_orders
+(
+    id        INT AUTO_INCREMENT,
+    client_id INT NULL,
+    order_id    INT NOT NULL,
+    drug_concept_id  INT NOT NULL,
+    drug        VARCHAR(255) NULL,
+    encounter_id INT  NULL,
+    instructions   VARCHAR(255) NULL,
+    date_activated  DATETIME,
+    urgency         VARCHAR(250) NULL,
+    order_number    VARCHAR(100) NULL,
+    dose            INT NULL ,
+    dose_units      VARCHAR(200) NULL,
+    quantity        INT NULL,
+    quantity_units VARCHAR(200) NULL,
+    duration        INT NULL,
+    duration_units  VARCHAR(200) NULL,
+        PRIMARY KEY (id)
+) CHARSET = UTF8;
+
+CREATE INDEX
+    mamba_fact_medication_orders_client_id_index ON mamba_fact_medication_orders (client_id);
+CREATE INDEX
+    mamba_fact_medication_orders_order_id_index ON mamba_fact_medication_orders (order_id);
+
+
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_medication_orders_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_medication_orders_insert;
+
+DELIMITER //
+
+~
+CREATE PROCEDURE sp_fact_medication_orders_insert()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_medication_orders_insert', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_medication_orders_insert', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+INSERT INTO mamba_fact_medication_orders(order_id, client_id,
+                                         drug_concept_id,
+                                         encounter_id,
+                                         instructions,
+                                         date_activated,
+                                         urgency,
+                                         order_number,
+                                         dose,
+                                         dose_units,
+                                         quantity,
+                                         quantity_units,
+                                         duration,
+                                         duration_units)
+SELECT o.order_id,
+       patient_id   AS client,
+       o.concept_id AS drug,
+       encounter_id,
+       instructions,
+       date_activated,
+       urgency,
+       order_number,
+       dose,
+       cn3.name     AS dose_units,
+       quantity,
+       cn1.name     AS quantity_units,
+       duration,
+       cn2.name     AS duration_units
+FROM orders o
+         INNER JOIN order_type ot ON o.order_type_id = ot.order_type_id
+         INNER JOIN drug_order d_o ON o.order_id = d_o.order_id
+         LEFT JOIN concept_name cn1 ON d_o.quantity_units = cn1.concept_id
+    AND cn1.locale = 'en' AND cn1.concept_name_type = 'FULLY_SPECIFIED' AND cn1.locale_preferred = 1
+         LEFT JOIN concept_name cn2 ON d_o.duration_units = cn2.concept_id AND cn2.locale_preferred = 1
+    AND cn2.locale = 'en' AND cn2.concept_name_type = 'FULLY_SPECIFIED'
+         LEFT JOIN concept_name cn3 ON d_o.dose_units = cn3.concept_id AND cn3.locale_preferred = 1
+    AND cn3.locale = 'en' AND cn3.concept_name_type = 'FULLY_SPECIFIED'
+
+WHERE ot.uuid = '131168f4-15f5-102d-96e4-000c29c2a5d7'
+  AND o.voided = 0
+;
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_medication_orders_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_medication_orders_update;
+
+DELIMITER //
+
+~
+CREATE PROCEDURE sp_fact_medication_orders_update()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_medication_orders_update', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_medication_orders_update', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+UPDATE mamba_fact_medication_orders mo
+    JOIN (
+        SELECT cn.concept_id, cn.name
+        FROM concept_name cn
+        WHERE cn.locale = 'en'
+          AND cn.voided = 0
+          AND (
+            cn.locale_preferred = 1
+                OR cn.concept_name_type = 'FULLY_SPECIFIED'
+            )
+    ) best_names ON best_names.concept_id = mo.drug_concept_id
+SET mo.drug = best_names.name;
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_medication_orders  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_medication_orders;
+
+DELIMITER //
+
+~
+CREATE PROCEDURE sp_fact_medication_orders()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_medication_orders', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_medication_orders', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CALL sp_fact_medication_orders_create();
+CALL sp_fact_medication_orders_insert();
+CALL sp_fact_medication_orders_update();
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_medication_orders_query  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+
+
+        
+-- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_data_processing_derived_hiv_art_card  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -24244,6 +24537,7 @@ CALL sp_fact_encounter_hiv_art_card;
 CALL sp_fact_encounter_hiv_art_summary;
 CALL sp_fact_encounter_hiv_art_health_education;
 CALL sp_fact_active_in_care;
+CALL sp_fact_medication_orders;
 CALL sp_fact_latest_adherence_patients;
 CALL sp_fact_latest_advanced_disease_patients;
 CALL sp_fact_latest_arv_days_dispensed_patients;
@@ -24274,6 +24568,7 @@ CALL sp_fact_current_arv_regimen_start_date;
 CALL sp_fact_latest_pregnancy_status_patients;
 CALL sp_fact_calhiv_patients;
 CALL sp_fact_eid_patients;
+
 
 -- $END
 END //

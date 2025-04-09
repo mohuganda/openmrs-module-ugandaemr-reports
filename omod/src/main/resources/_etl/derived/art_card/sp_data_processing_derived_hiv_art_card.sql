@@ -4,6 +4,7 @@ CALL sp_fact_encounter_hiv_art_card;
 CALL sp_fact_encounter_hiv_art_summary;
 CALL sp_fact_encounter_hiv_art_health_education;
 CALL sp_fact_active_in_care;
+CALL sp_fact_medication_orders;
 CALL sp_fact_latest_adherence_patients;
 CALL sp_fact_latest_advanced_disease_patients;
 CALL sp_fact_latest_arv_days_dispensed_patients;
@@ -34,5 +35,6 @@ CALL sp_fact_current_arv_regimen_start_date;
 CALL sp_fact_latest_pregnancy_status_patients;
 CALL sp_fact_calhiv_patients;
 CALL sp_fact_eid_patients;
+
 
 -- $END

@@ -234,6 +234,13 @@ facts/audit_tools/eid_patients/sp_fact_eid_patients_insert.sql
 facts/audit_tools/eid_patients/sp_fact_eid_patients_query.sql
 facts/audit_tools/eid_patients/sp_fact_eid_patients_update.sql
 
+
+facts/medication_orders/sp_fact_medication_orders_create.sql
+facts/medication_orders/sp_fact_medication_orders_insert.sql
+facts/medication_orders/sp_fact_medication_orders_update.sql
+facts/medication_orders/sp_fact_medication_orders.sql
+facts/medication_orders/sp_fact_medication_orders_query.sql
+
 #############################################################################
 ###### A single stored procedure that invokes (CALLs) the above SPs #########
 #############################################################################
