@@ -3905,7 +3905,7 @@
     },
     {
       "indicator_name": "HC17",
-      "sqlQuery": "",
+      "sqlQuery": "SELECT mda.normal_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_medication_orders\n                     WHERE date_activated <= ':endDate'\n                       AND date_activated >= ':startDate'\n                       AND drug = 'COTRIMOXAZOLE') on_cpt\n                    ON a.client_id = on_cpt.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4005,7 +4005,7 @@
     },
     {
       "indicator_name": "HC18a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_status IS NOT NULL) tbstatus\n                    ON a.client_id = tbstatus.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date >= ':startDate'\n                       AND baseline_regimen_start_date <= ':endDate') new_clients ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4105,7 +4105,7 @@
     },
     {
       "indicator_name": "HC18b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_status IS NOT NULL\n                       AND tuberculosis_status NOT IN\n                           ('No signs or symptoms of TB', 'TB Treatment Completed')) tb_presumptive\n                    ON a.client_id = tb_presumptive.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date >= ':startDate'\n                       AND baseline_regimen_start_date <= ':endDate') new_clients ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4205,7 +4205,7 @@
     },
     {
       "indicator_name": "HC18c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_status IS NOT NULL\n                       AND tuberculosis_status NOT IN ('No signs or symptoms of TB', 'TB Treatment Completed',\n                                                       'Suspect TB - referred or sputum sent')) tb_presumptive\n                    ON a.client_id = tb_presumptive.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date >= ':startDate'\n                       AND baseline_regimen_start_date <= ':endDate') new_clients ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4305,7 +4305,7 @@
     },
     {
       "indicator_name": "HC18d",
-      "sqlQuery": "",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                            AND tuberculosis_status = 'Currently on TB treatment'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_treatment_start_date >= ':startDate'\n                       AND tuberculosis_treatment_start_date <= ':endDate') tbx\n                    ON a.client_id = tbx.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date >= ':startDate'\n                       AND baseline_regimen_start_date <= ':endDate') new_clients ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4405,7 +4405,7 @@
     },
     {
       "indicator_name": "HC19a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_status IS NOT NULL) tbstatus\n                    ON a.client_id = tbstatus.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date < ':startDate') new_clients\n                    ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4505,7 +4505,7 @@
     },
     {
       "indicator_name": "HC19b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_status IS NOT NULL\n                       AND tuberculosis_status NOT IN\n                           ('No signs or symptoms of TB', 'TB Treatment Completed')) tb_presumptive\n                    ON a.client_id = tb_presumptive.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date < ':startDate') new_clients\n                    ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4605,7 +4605,7 @@
     },
     {
       "indicator_name": "HC19c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_status IS NOT NULL\n                       AND tuberculosis_status NOT IN ('No signs or symptoms of TB', 'TB Treatment Completed',\n                                                       'Suspect TB - referred or sputum sent')) tb_presumptive\n                    ON a.client_id = tb_presumptive.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date < ':startDate') new_clients\n                    ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4705,7 +4705,7 @@
     },
     {
       "indicator_name": "HC19d",
-      "sqlQuery": "",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                            AND tuberculosis_status = 'Currently on TB treatment'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_treatment_start_date >= ':startDate'\n                       AND tuberculosis_treatment_start_date <= ':endDate') tbx\n                    ON a.client_id = tbx.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date < ':startDate') new_clients\n                    ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4805,7 +4805,7 @@
     },
     {
       "indicator_name": "HC20",
-      "sqlQuery": "",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tuberculosis_status IN\n                           ('TB Diagnosed - TB Microscopy', 'TB Diagnosed - Gene Xpert', 'TB Diagnosed - TB LAM',\n                            'TB Diagnosed - TB LAM')\n                       AND tpt_status = 'NEVER') tb_presumptive\n                    ON a.client_id = tb_presumptive.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -4905,7 +4905,7 @@
     },
     {
       "indicator_name": "HC21a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tpt_status = 'NEVER') tpt_eligible\n                    ON a.client_id = tpt_eligible.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date >= ':startDate'\n                       AND baseline_regimen_start_date <= ':endDate') new_clients ON a.client_id = new_clients.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5005,7 +5005,7 @@
     },
     {
       "indicator_name": "HC21b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE tpt_status = 'NEVER') tpt_eligible\n                    ON a.client_id = tpt_eligible.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary mfehas\n                     WHERE baseline_regimen_start_date < ':startDate') previous_on_art\n                    ON a.client_id = previous_on_art.client_id\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5105,7 +5105,7 @@
     },
     {
       "indicator_name": "HC22a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MIN(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                            AND tpt_status = 'On TPT (1HP)'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE mfehac.encounter_date BETWEEN ':endDate' AND ':startDate') tpt_started\n                    ON a.client_id = tpt_started.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5205,7 +5205,7 @@
     },
     {
       "indicator_name": "HC22b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MIN(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                            AND tpt_status = 'On TPT (3HP)'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE mfehac.encounter_date BETWEEN ':endDate' AND ':startDate') tpt_started\n                    ON a.client_id = tpt_started.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5305,7 +5305,7 @@
     },
     {
       "indicator_name": "HC22c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MIN(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                            AND tpt_status = 'On TPT (6H)'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE mfehac.encounter_date BETWEEN ':endDate' AND ':startDate') tpt_started\n                    ON a.client_id = tpt_started.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5405,7 +5405,7 @@
     },
     {
       "indicator_name": "HC22d",
-      "sqlQuery": "",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MIN(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                            AND tpt_status = 'OTHER SPECIFY'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE mfehac.encounter_date BETWEEN ':endDate' AND ':startDate') tpt_started\n                    ON a.client_id = tpt_started.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5505,7 +5505,7 @@
     },
     {
       "indicator_name": "HC23",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT mfti.client_id\n      FROM mamba_fact_transfer_in mfti\n               LEFT JOIN (SELECT client_id, transfer_out_date\n                          FROM mamba_fact_transfer_out\n                          WHERE transfer_out_date BETWEEN ':startDate' AND ':endDate') mfto\n                         ON mfti.client_id = mfto.client_id AND transfer_out_date > transfer_in_date\n      WHERE transfer_in_date >= ':startDate'\n        AND transfer_in_date <= ':endDate'\n        AND mfto.client_id IS NULL) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age \nGROUP BY age_group, sex;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE nutrition_assesment IS NOT NULL) nutrition_asses\n                    ON a.client_id = nutrition_asses.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5605,7 +5605,7 @@
     },
     {
       "indicator_name": "HC24",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate' AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  and baseline_cd4 is NOT null\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE nutrition_assesment IN\n                           ('SEVERE ACUTE MALNUTRITION WITH OEDEMA', 'MODERATE ACUTE MALNUTRITION',\n                            'SEVERE ACUTE MALNUTRITION', 'OBESE','Overweight')) nutrition_asses\n                    ON a.client_id = nutrition_asses.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5705,7 +5705,7 @@
     },
     {
       "indicator_name": "HC25",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate' AND transfer_in_date <= ':endDate') mfti\n                   ON mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE nutrition_assesment IN\n                           ('SEVERE ACUTE MALNUTRITION WITH OEDEMA', 'MODERATE ACUTE MALNUTRITION',\n                            'SEVERE ACUTE MALNUTRITION', 'OBESE')) nutrition_asses\n                    ON a.client_id = nutrition_asses.client_id\n         INNER JOIN (SELECT mfehac.client_id\n                     FROM mamba_fact_encounter_hiv_art_card mfehac\n                              INNER JOIN (SELECT client_id, MAX(encounter_date) AS encounter_date\n                                          FROM mamba_fact_encounter_hiv_art_card\n                                          WHERE encounter_date <= ':endDate'\n                                          GROUP BY client_id) a\n                                         ON mfehac.encounter_date = a.encounter_date AND mfehac.client_id = a.client_id\n                     WHERE nutrition_support_and_infant_feeding IN ('THERAPEUTIC FEEDING','Supplementary Feeding','INFANT FEEDING COUNSELING','NUTRITION COUNSELLING ONLY >2YRS')) nutrition_support\n                    ON a.client_id = nutrition_support.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5805,7 +5805,7 @@
     },
     {
       "indicator_name": "HC26a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND DATE_SUB(':endDate', INTERVAL 9 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -5905,7 +5905,7 @@
     },
     {
       "indicator_name": "HC26b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND DATE_SUB(':endDate', INTERVAL 9 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE encounter_date BETWEEN ':startDate' AND ':endDate'\n                       AND hiv_viral_load_copies IS NOT NULL) vl\n                    ON a.client_id = vl.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6005,7 +6005,7 @@
     },
     {
       "indicator_name": "HC26c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND DATE_SUB(':endDate', INTERVAL 9 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE ((specimen_type = 'WHOLE BLOOD' AND hiv_viral_load_copies <= 200)\n                         OR (specimen_type = 'Dried Blood Spot' AND hiv_viral_load_copies <= 400))\n                       AND encounter_date BETWEEN ':startDate' AND ':endDate') suppressed\n                    ON a.client_id = suppressed.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6105,7 +6105,7 @@
     },
     {
       "indicator_name": "HC27a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 3 MONTH) AND DATE_SUB(':endDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_encounter_hiv_art_card\n                     WHERE encounter_date <= ':endDate'\n                       AND encounter_date >= ':startDate'\n                       AND pregnant IS NOT NULL) pregnant\n                    ON a.client_id = pregnant.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6205,7 +6205,7 @@
     },
     {
       "indicator_name": "HC27b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 3 MONTH) AND DATE_SUB(':endDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_encounter_hiv_art_card\n                     WHERE encounter_date <= ':endDate'\n                       AND encounter_date >= ':startDate'\n                       AND pregnant IS NOT NULL) pregnant\n                    ON a.client_id = pregnant.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE encounter_date BETWEEN ':startDate' AND ':endDate'\n                       AND hiv_viral_load_copies IS NOT NULL) vl\n                    ON a.client_id = vl.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6305,7 +6305,7 @@
     },
     {
       "indicator_name": "HC27c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 3 MONTH) AND DATE_SUB(':endDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_encounter_hiv_art_card\n                     WHERE encounter_date <= ':endDate'\n                       AND encounter_date >= ':startDate'\n                       AND pregnant IS NOT NULL) pregnant\n                    ON a.client_id = pregnant.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE ((specimen_type = 'WHOLE BLOOD' AND hiv_viral_load_copies <= 200)\n                         OR (specimen_type = 'Dried Blood Spot' AND hiv_viral_load_copies <= 400))\n                       AND encounter_date BETWEEN ':startDate' AND ':endDate') suppressed\n                    ON a.client_id = suppressed.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6405,7 +6405,7 @@
     },
     {
       "indicator_name": "HC28a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 3 MONTH) AND DATE_SUB(':endDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_encounter_hiv_art_card\n                     WHERE encounter_date <= ':endDate'\n                       AND pregnant IS NOT NULL) pregnant\n                    ON a.client_id = pregnant.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6505,7 +6505,7 @@
     },
     {
       "indicator_name": "HC28b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 3 MONTH) AND DATE_SUB(':endDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_encounter_hiv_art_card\n                     WHERE encounter_date <= ':endDate'\n                       AND pregnant IS NOT NULL) pregnant\n                    ON a.client_id = pregnant.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE encounter_date BETWEEN ':startDate' AND ':endDate'\n                       AND hiv_viral_load_copies IS NOT NULL) vl\n                    ON a.client_id = vl.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6605,7 +6605,7 @@
     },
     {
       "indicator_name": "HC28c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 3 MONTH) AND DATE_SUB(':endDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_encounter_hiv_art_card\n                     WHERE encounter_date <= ':endDate'\n                       AND pregnant IS NOT NULL) pregnant\n                    ON a.client_id = pregnant.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE ((specimen_type = 'WHOLE BLOOD' AND hiv_viral_load_copies <= 200)\n                         OR (specimen_type = 'Dried Blood Spot' AND hiv_viral_load_copies <= 400))\n                       AND encounter_date BETWEEN ':startDate' AND ':endDate') suppressed\n                    ON a.client_id = suppressed.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6705,7 +6705,7 @@
     },
     {
       "indicator_name": "HC29a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date < DATE_SUB(':startDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT p.patient_id\n                     FROM patient p\n                              INNER JOIN mamba_fact_patients_latest_viral_load mfplvl ON p.patient_id = mfplvl.client_id\n                              INNER JOIN mamba_fact_art_patients mfap ON mfplvl.client_id = mfap.client_id\n                     WHERE (IF(TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 16,\n                               DATE_ADD(hiv_viral_collection_date, INTERVAL 6 MONTH),\n                               DATE_ADD(hiv_viral_collection_date, INTERVAL 12 MONTH)) BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate' OR\n                            hiv_viral_collection_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate')) eligible_for_vl\n                    ON a.client_id = eligible_for_vl.patient_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6805,7 +6805,7 @@
     },
     {
       "indicator_name": "HC29b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date < DATE_SUB(':startDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT p.patient_id\n                     FROM patient p\n                              INNER JOIN mamba_fact_patients_latest_viral_load mfplvl ON p.patient_id = mfplvl.client_id\n                              INNER JOIN mamba_fact_art_patients mfap ON mfplvl.client_id = mfap.client_id\n                     WHERE (IF(TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 16,\n                               DATE_ADD(hiv_viral_collection_date, INTERVAL 6 MONTH),\n                               DATE_ADD(hiv_viral_collection_date, INTERVAL 12 MONTH)) BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate' OR\n                            hiv_viral_collection_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate')) eligible_for_vl\n                    ON a.client_id = eligible_for_vl.patient_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE encounter_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate'\n                       AND hiv_viral_load_copies IS NOT NULL) vl\n                    ON a.client_id = vl.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -6905,7 +6905,7 @@
     },
     {
       "indicator_name": "HC29c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date < DATE_SUB(':startDate', INTERVAL 3 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT p.patient_id\n                     FROM patient p\n                              INNER JOIN mamba_fact_patients_latest_viral_load mfplvl ON p.patient_id = mfplvl.client_id\n                              INNER JOIN mamba_fact_art_patients mfap ON mfplvl.client_id = mfap.client_id\n                     WHERE (IF(TIMESTAMPDIFF(YEAR, birthdate, CURDATE()) < 16,\n                               DATE_ADD(hiv_viral_collection_date, INTERVAL 6 MONTH),\n                               DATE_ADD(hiv_viral_collection_date, INTERVAL 12 MONTH)) BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate' OR\n                            hiv_viral_collection_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate')) eligible_for_vl\n                    ON a.client_id = eligible_for_vl.patient_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE ((specimen_type = 'WHOLE BLOOD' AND hiv_viral_load_copies <= 200)\n                         OR (specimen_type = 'Dried Blood Spot' AND hiv_viral_load_copies <= 400))\n                       AND encounter_date BETWEEN DATE_SUB(':startDate', INTERVAL 9 MONTH) AND ':endDate') suppressed\n                    ON a.client_id = suppressed.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -7005,7 +7005,7 @@
     },
     {
       "indicator_name": "HC30a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 12 MONTH) AND DATE_SUB(':enDate', INTERVAL 12 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -7105,7 +7105,7 @@
     },
     {
       "indicator_name": "HC30b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 12 MONTH) AND DATE_SUB(':enDate', INTERVAL 12 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE encounter_date BETWEEN ':startDate' AND ':endDate'\n                       AND hiv_viral_load_copies IS NOT NULL) vl\n                    ON a.client_id = vl.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -7205,7 +7205,7 @@
     },
     {
       "indicator_name": "HC30c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n         INNER JOIN (SELECT client_id\n                     FROM mamba_fact_encounter_hiv_art_summary\n                     WHERE baseline_regimen_start_date BETWEEN DATE_SUB(':startDate', INTERVAL 12 MONTH) AND DATE_SUB(':enDate', INTERVAL 12 MONTH)) art_start\n                    ON a.client_id = art_start.client_id\n         INNER JOIN (SELECT DISTINCT client_id\n                     FROM mamba_fact_patients_latest_viral_load\n                     WHERE ((specimen_type = 'WHOLE BLOOD' AND hiv_viral_load_copies <= 200)\n                         OR (specimen_type = 'Dried Blood Spot' AND hiv_viral_load_copies <= 400))\n                       AND encounter_date BETWEEN ':startDate' AND ':endDate') suppressed\n                    ON a.client_id = suppressed.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -7302,1108 +7302,7 @@
           "value_place_holder": "30c-r"
         }
       ]
-    },
-    {
-      "indicator_name": "HC31",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT mfti.client_id\n      FROM mamba_fact_transfer_in mfti\n               LEFT JOIN (SELECT client_id, transfer_out_date\n                          FROM mamba_fact_transfer_out\n                          WHERE transfer_out_date BETWEEN ':startDate' AND ':endDate') mfto\n                         ON mfti.client_id = mfto.client_id AND transfer_out_date > transfer_in_date\n      WHERE transfer_in_date >= ':startDate'\n        AND transfer_in_date <= ':endDate'\n        AND mfto.client_id IS NULL) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age \nGROUP BY age_group, sex;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "31a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "31b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "31c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "31d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "31e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "31f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "31g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "31h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "31i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "31j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "31k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "31l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "31m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "31n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "31o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "31p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "31q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "31r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC32",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate' AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  and baseline_cd4 is NOT null\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "32a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "32b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "32c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "32d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "32e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "32f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "32g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "32h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "32i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "32j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "32k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "32l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "32m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "32n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "32o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "32p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "32q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "32r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC33",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate' AND transfer_in_date <= ':endDate') mfti\n                   ON mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "33a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "33b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "33c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "33d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "33e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "33f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "33g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "33h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "33i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "33j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "33k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "33l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "33m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "33n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "33o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "33p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "33q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "33r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC34a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "34a-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "34a-r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC34b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "34b-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "34b-r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC34c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "34c-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "34c-r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC35a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "35a-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "35a-r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC35b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "35b-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "35b-r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC36a",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "36a-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "36a-r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC36b",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "36b-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "36b-r"
-        }
-      ]
-    },
-    {
-      "indicator_name": "HC36c",
-      "sqlQuery": "SELECT mda.moh_2024_age_group AS age_group, gender, COUNT(DISTINCT mfehas.client_id)\nFROM mamba_fact_encounter_hiv_art_summary mfehas\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON mfehas.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         INNER JOIN mamba_fact_encounter_hiv_art_card mfehac ON mfehac.client_id = mfehas.client_id\n         LEFT JOIN (SELECT client_id\n                    FROM mamba_fact_transfer_in\n                    WHERE transfer_in_date >= ':startDate'\n                      AND transfer_in_date <= ':endDate') mfti ON\n    mfti.client_id = mfehas.client_id\nWHERE baseline_regimen_start_date >= ':startDate'\n  AND baseline_regimen_start_date <= ':endDate'\n  AND baseline_cd4 < 200\n  AND mfehac.crag_test_results LIKE '%positive%'\n  AND mfehac.encounter_date >= ':startDate'\n  AND mfehac.encounter_date <= ':endDate'\n  AND mfti.client_id IS NULL\nGROUP BY age_group, gender;",
-      "dissaggregations": [
-        "age_group",
-        "gender"
-      ],
-      "values": [
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-a"
-        },
-        {
-          "dissaggregations1": "0-4",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-b"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-c"
-        },
-        {
-          "dissaggregations1": "5-9",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-d"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-e"
-        },
-        {
-          "dissaggregations1": "10-14",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-f"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-g"
-        },
-        {
-          "dissaggregations1": "15-19",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-h"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-i"
-        },
-        {
-          "dissaggregations1": "20-24",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-j"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-k"
-        },
-        {
-          "dissaggregations1": "25-29",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-l"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-m"
-        },
-        {
-          "dissaggregations1": "30-39",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-n"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-o"
-        },
-        {
-          "dissaggregations1": "40-49",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-p"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "M",
-          "value_place_holder": "36c-q"
-        },
-        {
-          "dissaggregations1": "50+",
-          "dissaggregations2": "F",
-          "value_place_holder": "36c-r"
-        }
-      ]
-    }
-  ]
+    }  ]
 }
 
 
