@@ -14,6 +14,13 @@ facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group_u
 facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group_query.sql
 facts/facts_non_supressed_obs_group/sp_fact_encounter_non_suppressed_obs_group.sql
 
+
+facts/facts_non_supressed_repeat_vl/sp_fact_encounter_non_suppressed_repeat_vl.sql
+facts/facts_non_supressed_repeat_vl/sp_fact_encounter_non_suppressed_repeat_vl_create.sql
+facts/facts_non_supressed_repeat_vl/sp_fact_encounter_non_suppressed_repeat_vl_insert.sql
+facts/facts_non_supressed_repeat_vl/sp_fact_encounter_non_suppressed_repeat_vl_query.sql
+facts/facts_non_supressed_repeat_vl/sp_fact_encounter_non_suppressed_repeat_vl_update.sql
+
 #############################################################################
 ######## A single stored procedure that invokes (CALLs) the above SPs #######
 #############################################################################

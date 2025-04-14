@@ -13857,6 +13857,7 @@ END;
 -- $BEGIN
 CALL sp_fact_encounter_non_suppressed_card;
 CALL sp_fact_encounter_non_suppressed_obs_group;
+CALL sp_fact_encounter_non_suppressed_repeat_vl;
 -- $END
 END //
 
@@ -25651,6 +25652,236 @@ DELIMITER ;
 
         
 -- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_repeat_vl  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_repeat_vl;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_repeat_vl()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_repeat_vl', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_repeat_vl', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CALL sp_fact_encounter_non_suppressed_repeat_vl_create();
+CALL sp_fact_encounter_non_suppressed_repeat_vl_insert();
+CALL sp_fact_encounter_non_suppressed_repeat_vl_update();
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_repeat_vl_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_repeat_vl_create;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_repeat_vl_create()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_repeat_vl_create', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_repeat_vl_create', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CREATE TABLE mamba_fact_non_suppressed_repeat_vl
+(
+    id                   INT AUTO_INCREMENT,
+    client_id            INT  NULL,
+    encounter_id           INT NULL,
+    obs_group_id            INT NULL,
+    obs_datetime            DATETIME NULL,
+    vl_sample_collection      VARCHAR(50) NULL,
+    hivdr_sample_Collection     VARCHAR(100) NULL,
+    vl_repeat_date                   DATE NULL,
+    iac_results                VARCHAR(250) NULL,
+    copies                INT NULL,
+    date_vl_received                   DATE NULL,
+    hivdr_results_received                  DATE NULL,
+    hivdr_results                   VARCHAR(250) NULL,
+    hivdr_result_date                   DATE NULL,
+
+    PRIMARY KEY (id)
+) CHARSET = UTF8;
+
+CREATE INDEX
+    mamba_fact_non_suppressed_repeat_vl_client_id_index ON mamba_fact_non_suppressed_repeat_vl (client_id);
+CREATE INDEX
+    mamba_fact_non_suppressed_repeat_vl_encounter_id_index ON mamba_fact_non_suppressed_repeat_vl (encounter_id);
+CREATE INDEX
+    mamba_fact_non_suppressed_repeat_vl_obs_group_id_index ON mamba_fact_non_suppressed_repeat_vl (obs_group_id);
+
+
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_repeat_vl_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_repeat_vl_insert;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_repeat_vl_insert()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_repeat_vl_insert', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_repeat_vl_insert', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+INSERT INTO mamba_fact_non_suppressed_repeat_vl (encounter_id,
+                                               client_id,
+                                                 obs_datetime,
+                                                 obs_group_id,
+                                                 vl_sample_collection,
+                                                 hivdr_sample_Collection,
+                                                 vl_repeat_date,
+                                                 iac_results,
+                                                 copies ,
+                                                 date_vl_received,
+                                                 hivdr_results_received,
+                                                 hivdr_results,
+                                                 hivdr_result_date)
+SELECT
+    og.encounter_id,
+    og.person_id,
+    og.obs_datetime,
+    og.obs_id AS obs_group_id,
+
+    MAX(CASE WHEN o.concept_id = 199121 THEN o.value_coded END) AS vl_sample_collected,
+    MAX(CASE WHEN o.concept_id = 164989 THEN o.value_coded END) AS hivdr_sample_sample_collected,
+    MAX(CASE WHEN o.concept_id = 163023 THEN o.value_datetime END) AS vl_repeat_date,
+    MAX(CASE WHEN o.concept_id = 1305 THEN o.value_coded END) AS iac_results,
+    MAX(CASE WHEN o.concept_id = 856 THEN o.value_numeric END) AS copies,
+    MAX(CASE WHEN o.concept_id = 163150 THEN o.value_datetime END) AS recieved_vl_date,
+    MAX(CASE WHEN o.concept_id = 199122 THEN o.value_coded END) AS hivdr_results_received,
+    MAX(CASE WHEN o.concept_id = 165824 THEN o.value_text END) AS hivdr_results,
+    MAX(CASE WHEN o.concept_id = 165823 THEN o.value_datetime END) AS hivdr_results_date
+
+FROM
+    obs og
+        LEFT JOIN obs o ON o.obs_group_id = og.obs_id AND o.voided = 0
+
+WHERE
+    og.concept_id = 163157
+
+  AND og.voided = 0
+GROUP BY
+    og.obs_id, og.encounter_id, og.person_id, og.obs_datetime;
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_repeat_vl_query  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_encounter_non_suppressed_repeat_vl_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_encounter_non_suppressed_repeat_vl_update;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_fact_encounter_non_suppressed_repeat_vl_update()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_encounter_non_suppressed_repeat_vl_update', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_encounter_non_suppressed_repeat_vl_update', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+-- $END
+END //
+
+DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_data_processing_derived_non_suppressed  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -25684,6 +25915,7 @@ END;
 -- $BEGIN
 CALL sp_fact_encounter_non_suppressed_card;
 CALL sp_fact_encounter_non_suppressed_obs_group;
+CALL sp_fact_encounter_non_suppressed_repeat_vl;
 -- $END
 END //
 
@@ -26098,4 +26330,6 @@ DROP EVENT IF EXISTS _mamba_etl_scheduler_event;
 
 -- Drop/Create the Event responsible for maintaining event logs at a max. 20 elements
 DROP EVENT IF EXISTS _mamba_etl_scheduler_trim_log_event;
+
+--
 
