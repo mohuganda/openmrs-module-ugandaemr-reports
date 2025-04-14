@@ -7405,7 +7405,7 @@
     },
     {
       "indicator_name": "HC32c",
-      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n\n         INNER JOIN (SELECT  DISTINCT person_id from obs where concept_id=163157 and obs_datetime >=':startDate' and obs_datetime <=':endDate' and voided=0) non_suppressed\n                    ON a.client_id = non_suppressed.person_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n\n         INNER JOIN (SELECT client_id from mamba_fact_non_suppressed_repeat_vl where vl_repeat_date BETWEEN ':startDate' and ':endDate') non_suppressed\n                    ON a.client_id = non_suppressed.client_id",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -7504,8 +7504,8 @@
       ]
     },
     {
-      "indicator_name": "HC32c",
-      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n\n         INNER JOIN (SELECT  DISTINCT person_id from obs where concept_id=163157 and obs_datetime >=':startDate' and obs_datetime <=':endDate' and voided=0) non_suppressed\n                    ON a.client_id = non_suppressed.person_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
+      "indicator_name": "HC33",
+      "sqlQuery": "SELECT mda.datim_agegroup AS age_group, mdp.gender AS sex, COUNT(DISTINCT a.client_id)\nFROM (SELECT client_id, TIMESTAMPDIFF(DAY, MAX(return_visit_date), ':endDate') ltfp_days\n      FROM mamba_fact_encounter_hiv_art_card\n      WHERE encounter_date <= ':endDate'\n        AND return_visit_date >= ':startDate'\n      GROUP BY client_id) a\n         INNER JOIN mamba_fact_patients_latest_patient_demographics mdp ON a.client_id = mdp.patient_id\n         LEFT JOIN mamba_dim_agegroup mda ON mda.age = mdp.age\n         LEFT JOIN (SELECT * FROM person p WHERE p.dead = 1 AND p.death_date <= ':endDate') p\n                   ON a.client_id = p.person_id\n         LEFT JOIN (SELECT mf_to.client_id\n                    FROM mamba_fact_transfer_out mf_to\n                             LEFT JOIN mamba_fact_transfer_in mf_ti ON mf_to.client_id = mf_ti.client_id\n                    WHERE transfer_out_date <= ':endDate'\n                      AND (transfer_out_date > transfer_in_date OR mf_ti.client_id IS NULL)) mfto\n                   ON a.client_id = mfto.client_id\n\n         INNER JOIN (SELECT client_id from mamba_fact_non_suppressed_repeat_vl where vl_repeat_date BETWEEN ':startDate' and ':endDate' and copies >=1000) non_suppressed\n                    ON a.client_id = non_suppressed.client_id\n\nWHERE ltfp_days <= 28\n  AND p.person_id IS NULL\n  AND mfto.client_id IS NULL\nGROUP BY age_group, sex;",
       "dissaggregations": [
         "age_group",
         "gender"
@@ -7514,95 +7514,95 @@
         {
           "dissaggregations1": "0-4",
           "dissaggregations2": "M",
-          "value_place_holder": "32-a"
+          "value_place_holder": "33-a"
         },
         {
           "dissaggregations1": "0-4",
           "dissaggregations2": "F",
-          "value_place_holder": "32-b"
+          "value_place_holder": "33-b"
         },
         {
           "dissaggregations1": "5-9",
           "dissaggregations2": "M",
-          "value_place_holder": "32-c"
+          "value_place_holder": "33-c"
         },
         {
           "dissaggregations1": "5-9",
           "dissaggregations2": "F",
-          "value_place_holder": "32-d"
+          "value_place_holder": "33-d"
         },
         {
           "dissaggregations1": "10-14",
           "dissaggregations2": "M",
-          "value_place_holder": "32-e"
+          "value_place_holder": "33-e"
         },
         {
           "dissaggregations1": "10-14",
           "dissaggregations2": "F",
-          "value_place_holder": "32-f"
+          "value_place_holder": "33-f"
         },
         {
           "dissaggregations1": "15-19",
           "dissaggregations2": "M",
-          "value_place_holder": "32-g"
+          "value_place_holder": "33-g"
         },
         {
           "dissaggregations1": "15-19",
           "dissaggregations2": "F",
-          "value_place_holder": "32-h"
+          "value_place_holder": "33-h"
         },
         {
           "dissaggregations1": "20-24",
           "dissaggregations2": "M",
-          "value_place_holder": "32-i"
+          "value_place_holder": "33-i"
         },
         {
           "dissaggregations1": "20-24",
           "dissaggregations2": "F",
-          "value_place_holder": "32-j"
+          "value_place_holder": "33-j"
         },
         {
           "dissaggregations1": "25-29",
           "dissaggregations2": "M",
-          "value_place_holder": "32-k"
+          "value_place_holder": "33-k"
         },
         {
           "dissaggregations1": "25-29",
           "dissaggregations2": "F",
-          "value_place_holder": "32-l"
+          "value_place_holder": "33-l"
         },
         {
           "dissaggregations1": "30-39",
           "dissaggregations2": "M",
-          "value_place_holder": "32-m"
+          "value_place_holder": "33-m"
         },
         {
           "dissaggregations1": "30-39",
           "dissaggregations2": "F",
-          "value_place_holder": "32-n"
+          "value_place_holder": "33-n"
         },
         {
           "dissaggregations1": "40-49",
           "dissaggregations2": "M",
-          "value_place_holder": "32-o"
+          "value_place_holder": "33-o"
         },
         {
           "dissaggregations1": "40-49",
           "dissaggregations2": "F",
-          "value_place_holder": "32-p"
+          "value_place_holder": "33-p"
         },
         {
           "dissaggregations1": "50+",
           "dissaggregations2": "M",
-          "value_place_holder": "32-q"
+          "value_place_holder": "33-q"
         },
         {
           "dissaggregations1": "50+",
           "dissaggregations2": "F",
-          "value_place_holder": "32-r"
+          "value_place_holder": "33-r"
         }
       ]
-    },
+    }
 
   ]
 }
