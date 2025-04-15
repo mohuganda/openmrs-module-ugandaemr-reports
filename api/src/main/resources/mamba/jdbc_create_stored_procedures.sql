@@ -13785,6 +13785,7 @@ CALL sp_fact_encounter_hiv_art_summary;
 CALL sp_fact_encounter_hiv_art_health_education;
 CALL sp_fact_active_in_care;
 CALL sp_fact_medication_orders;
+CALL sp_fact_test_orders;
 CALL sp_fact_latest_adherence_patients;
 CALL sp_fact_latest_advanced_disease_patients;
 CALL sp_fact_latest_arv_days_dispensed_patients;
@@ -24051,6 +24052,236 @@ END;
 
         
 -- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_test_orders  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_test_orders;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_test_orders()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_test_orders', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_test_orders', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CALL sp_fact_test_orders_create();
+CALL sp_fact_test_orders_insert();
+CALL sp_fact_test_orders_update();
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_test_orders_create  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_test_orders_create;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_test_orders_create()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_test_orders_create', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_test_orders_create', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+CREATE TABLE mamba_fact_test_orders
+(
+    id        INT AUTO_INCREMENT,
+    client_id INT NULL,
+    order_id    INT NOT NULL,
+    test_concept_id  INT NOT NULL,
+    test_name        VARCHAR(255) NULL,
+    encounter_id INT  NULL,
+    orderer     INT NULL,
+    instructions VARCHAR(255) NULL,
+    date_activated DATE NULL,
+    date_stopped   DATE NULL,
+    accession_number VARCHAR(200) NULL,
+    order_number     VARCHAR(150) NULL,
+    specimen_source VARCHAR(250) NULL,
+        PRIMARY KEY (id)
+) CHARSET = UTF8;
+
+CREATE INDEX
+    mamba_fact_test_orders_client_id_index ON mamba_fact_test_orders (client_id);
+CREATE INDEX
+    mamba_fact_test_orders_order_id_index ON mamba_fact_test_orders (order_id);
+
+
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_test_orders_insert  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_test_orders_insert;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_test_orders_insert()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_test_orders_insert', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_test_orders_insert', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+INSERT INTO mamba_fact_test_orders(order_id, client_id,
+                                   encounter_id,
+                                   test_concept_id,
+                                   test_name, orderer,
+                                   instructions,
+                                   date_activated,
+                                   date_stopped,
+                                   accession_number,
+                                   order_number,
+                                   specimen_source)
+SELECT o.order_id,
+       patient_id,
+       encounter_id,
+       o.concept_id,
+       cn.name  as test_name,
+       orderer,
+       instructions,
+       date_activated,
+       date_stopped,
+       accession_number,
+       order_number,
+       cn1.name as specimen_source
+FROM orders o
+         INNER JOIN order_type ot ON o.order_type_id = ot.order_type_id
+         INNER JOIN test_order t_o ON o.order_id = t_o.order_id
+         LEFT JOIN concept_name cn ON o.concept_id = cn.concept_id
+    AND cn.locale = 'en' AND cn.concept_name_type = 'FULLY_SPECIFIED' AND cn.locale_preferred = 1
+         LEFT JOIN concept_name cn1 ON specimen_source = cn1.concept_id
+    AND cn1.locale = 'en' AND cn1.concept_name_type = 'FULLY_SPECIFIED' AND cn1.locale_preferred = 1
+WHERE ot.uuid = '52a447d3-a64a-11e3-9aeb-50e549534c5e'
+  and o.voided = 0;
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_test_orders_query  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_fact_test_orders_update  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_fact_test_orders_update;
+
+
+~-~-
+CREATE PROCEDURE sp_fact_test_orders_update()
+BEGIN
+
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+    GET DIAGNOSTICS CONDITION 1
+
+    @message_text = MESSAGE_TEXT,
+    @mysql_errno = MYSQL_ERRNO,
+    @returned_sqlstate = RETURNED_SQLSTATE;
+
+    CALL sp_mamba_etl_error_log_insert('sp_fact_test_orders_update', @message_text, @mysql_errno, @returned_sqlstate);
+
+    UPDATE _mamba_etl_schedule
+    SET end_time                   = NOW(),
+        completion_status          = 'ERROR',
+        transaction_status         = 'COMPLETED',
+        success_or_error_message   = CONCAT('sp_fact_test_orders_update', ', ', @mysql_errno, ', ', @message_text)
+        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
+
+    RESIGNAL;
+END;
+
+-- $BEGIN
+UPDATE mamba_fact_medication_orders mo
+    JOIN (
+        SELECT cn.concept_id, cn.name
+        FROM concept_name cn
+        WHERE cn.locale = 'en'
+          AND cn.voided = 0
+          AND (
+            cn.locale_preferred = 1
+                OR cn.concept_name_type = 'FULLY_SPECIFIED'
+            )
+    ) best_names ON best_names.concept_id = mo.drug_concept_id
+SET mo.drug = best_names.name;
+-- $END
+END;
+~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_data_processing_derived_hiv_art_card  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -24088,6 +24319,7 @@ CALL sp_fact_encounter_hiv_art_summary;
 CALL sp_fact_encounter_hiv_art_health_education;
 CALL sp_fact_active_in_care;
 CALL sp_fact_medication_orders;
+CALL sp_fact_test_orders;
 CALL sp_fact_latest_adherence_patients;
 CALL sp_fact_latest_advanced_disease_patients;
 CALL sp_fact_latest_arv_days_dispensed_patients;

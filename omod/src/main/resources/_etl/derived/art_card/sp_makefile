@@ -241,6 +241,12 @@ facts/medication_orders/sp_fact_medication_orders_update.sql
 facts/medication_orders/sp_fact_medication_orders.sql
 facts/medication_orders/sp_fact_medication_orders_query.sql
 
+facts/test_orders/sp_fact_test_orders.sql
+facts/test_orders/sp_fact_test_orders_create.sql
+facts/test_orders/sp_fact_test_orders_insert.sql
+facts/test_orders/sp_fact_test_orders_query.sql
+facts/test_orders/sp_fact_test_orders_update.sql
+
 #############################################################################
 ###### A single stored procedure that invokes (CALLs) the above SPs #########
 #############################################################################
