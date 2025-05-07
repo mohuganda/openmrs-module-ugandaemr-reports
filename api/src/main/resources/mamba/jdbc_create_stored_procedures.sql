@@ -1776,8 +1776,8 @@ END;
 -- ----------------------  sp_mamba_flat_encounter_obs_group_table_create  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
-
 DROP PROCEDURE IF EXISTS `sp_mamba_flat_encounter_obs_group_table_create`;
+
 
 ~-~-
 CREATE PROCEDURE `sp_mamba_flat_encounter_obs_group_table_create`(
@@ -1800,7 +1800,7 @@ FROM `mamba_concept_metadata` cm
       FROM `mamba_z_encounter_obs` eo
                INNER JOIN `mamba_obs_group` og
                           ON eo.`obs_id` = og.`obs_id`
-      WHERE `obs_group_id` IS NOT NULL
+      WHERE eo.`obs_group_id` IS NOT NULL
         AND og.`obs_group_concept_name` = `obs_group_concept_name`) eo
      ON cm.`concept_id` = eo.`obs_question_concept_id`
 WHERE `flat_table_name` = `flat_encounter_table_name`
@@ -1813,7 +1813,8 @@ IF @column_labels IS NOT NULL THEN
                 '`visit_id` INT NULL,',
                 '`client_id` INT NOT NULL,',
                 '`encounter_datetime` DATETIME NOT NULL,',
-                '`location_id` INT NULL, ', @column_labels,
+                '`location_id` INT NULL, '
+                '`obs_group_id` INT NOT NULL,', @column_labels,
 
                 ',INDEX `mamba_idx_encounter_id` (`encounter_id`),',
                 'INDEX `mamba_idx_visit_id` (`visit_id`),',
@@ -1845,8 +1846,8 @@ END;
 -- ---------------------------------------------------------------------------------------------
 
 -- Flatten all Encounters given in Config folder
-
 DROP PROCEDURE IF EXISTS sp_mamba_flat_encounter_obs_group_table_create_all;
+
 
 ~-~-
 CREATE PROCEDURE sp_mamba_flat_encounter_obs_group_table_create_all()
@@ -1909,9 +1910,8 @@ END;
 -- ----------------------  sp_mamba_flat_encounter_obs_group_table_insert  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
-
-
 DROP PROCEDURE IF EXISTS sp_mamba_flat_encounter_obs_group_table_insert;
+
 
 ~-~-
 CREATE PROCEDURE sp_mamba_flat_encounter_obs_group_table_insert(
@@ -1994,7 +1994,7 @@ IF @column_labels IS NOT NULL THEN
 
     SET @insert_stmt = CONCAT(
             'INSERT INTO `', @tbl_obs_group_name, '` ',
-            'SELECT eo.`encounter_id`, MAX(eo.`visit_id`) AS `visit_id`, eo.`person_id`, eo.`encounter_datetime`, MAX(eo.`location_id`) AS `location_id`, ',
+            'SELECT eo.`encounter_id`, MAX(eo.`visit_id`) AS `visit_id`, eo.`person_id`, eo.`encounter_datetime`, MAX(eo.`location_id`) AS `location_id`, eo.`obs_group_id`, ',
             @column_labels, ' ',
             'FROM `mamba_z_encounter_obs` eo ',
             'INNER JOIN `mamba_temp_concept_metadata_group` tcm ON tcm.`concept_uuid` = eo.`obs_question_uuid` ',
@@ -2017,7 +2017,7 @@ SET @update_stmt = (
 
         SET @insert_stmt = CONCAT(
             'INSERT INTO `', @tbl_obs_group_name, '` ',
-            'SELECT eo.`encounter_id`, MAX(eo.`visit_id`) AS `visit_id`, eo.`person_id`, eo.`encounter_datetime`, MAX(eo.`location_id`) AS `location_id`, ',
+            'SELECT eo.`encounter_id`, MAX(eo.`visit_id`) AS `visit_id`, eo.`person_id`, eo.`encounter_datetime`, MAX(eo.`location_id`) AS `location_id`,eo.`obs_group_id` , ',
             @column_labels, ' ',
             'FROM `mamba_z_encounter_obs` eo ',
             'INNER JOIN `mamba_temp_concept_metadata_group` tcm ON tcm.`concept_uuid` = eo.`obs_value_coded_uuid` ',
@@ -2044,8 +2044,8 @@ END;
 -- ---------------------------------------------------------------------------------------------
 
 -- Flatten all Encounters given in Config folder
-
 DROP PROCEDURE IF EXISTS sp_mamba_flat_encounter_obs_group_table_insert_all;
+
 
 ~-~-
 CREATE PROCEDURE sp_mamba_flat_encounter_obs_group_table_insert_all()
@@ -5192,6 +5192,7 @@ CREATE TABLE mamba_obs_group
     obs_id                 INT          NOT NULL,
     obs_group_concept_id   INT          NOT NULL,
     obs_group_concept_name VARCHAR(255) NOT NULL, -- should be the concept name of the obs
+    obs_group_id           INT          NOT NULL,
 
     INDEX mamba_idx_obs_id (obs_id),
     INDEX mamba_idx_obs_group_concept_id (obs_group_concept_id),
@@ -5256,10 +5257,11 @@ DEALLOCATE PREPARE stmt_temp_insert;
 
 -- Insert into the final table from the temp table, including concept data
 SET @sql_obs_group_insert = CONCAT('
-            INSERT INTO mamba_obs_group (obs_group_concept_id, obs_group_concept_name, obs_id)
+            INSERT INTO mamba_obs_group (obs_group_concept_id, obs_group_concept_name, obs_id,obs_group_id)
             SELECT DISTINCT o.obs_question_concept_id,
                             LEFT(c.auto_table_column_name, 12) AS name,
-                            o.obs_id
+                            o.obs_id,
+                            o.obs_group_id
             FROM mamba_temp_obs_group_ids t
                      INNER JOIN mamba_z_encounter_obs o ON t.obs_group_id = o.obs_group_id
                      INNER JOIN mamba_dim_concept c ON o.obs_question_concept_id = c.concept_id
@@ -14419,45 +14421,27 @@ END;
 -- ----------------------  sp_mamba_data_processing_etl  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
+
 DROP PROCEDURE IF EXISTS sp_mamba_data_processing_etl;
 
-
 ~-~-
-CREATE PROCEDURE sp_mamba_data_processing_etl()
+CREATE PROCEDURE sp_mamba_data_processing_etl(IN etl_incremental_mode INT)
+
 BEGIN
+    -- add base folder SP here if any --
 
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-    GET DIAGNOSTICS CONDITION 1
+    CALL sp_data_processing_derived_transfers();
+    CALL sp_data_processing_derived_non_suppressed();
+    CALL sp_data_processing_derived_hiv_art_card();
+    CALL sp_data_processing_derived_IIT();
+    CALL sp_data_processing_derived_hts();
 
-    @message_text = MESSAGE_TEXT,
-    @mysql_errno = MYSQL_ERRNO,
-    @returned_sqlstate = RETURNED_SQLSTATE;
-
-    CALL sp_mamba_etl_error_log_insert('sp_mamba_data_processing_etl', @message_text, @mysql_errno, @returned_sqlstate);
-
-    UPDATE _mamba_etl_schedule
-    SET end_time                   = NOW(),
-        completion_status          = 'ERROR',
-        transaction_status         = 'COMPLETED',
-        success_or_error_message   = CONCAT('sp_mamba_data_processing_etl', ', ', @mysql_errno, ', ', @message_text)
-        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
-
-    RESIGNAL;
 END;
+~-~-
 
--- $BEGIN
--- add base folder SP here --
--- CALL sp_data_processing_derived_hts();
 
-CALL sp_data_processing_derived_transfers();
-CALL sp_data_processing_derived_non_suppressed();
-CALL sp_data_processing_derived_hiv_art_card();
-CALL sp_data_processing_derived_IIT();
-CALL sp_data_processing_derived_hts();
+
     -- $END
-END;
-~-~-
 
 
         
