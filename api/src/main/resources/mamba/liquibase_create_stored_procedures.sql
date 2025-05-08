@@ -14536,7 +14536,7 @@ BEGIN
                      FROM information_schema.tables
                      WHERE TABLE_TYPE = 'BASE TABLE'
                        AND TABLE_SCHEMA = @database_name
-                       AND TABLE_NAME REGEXP '^(fact_)');
+                       AND TABLE_NAME REGEXP '^(mamba_fact_)');
 
         IF (@tbls IS NOT NULL) THEN
 
