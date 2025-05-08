@@ -1,7 +1,7 @@
-CREATE database IF NOT EXISTS kisenyi;
+CREATE database IF NOT EXISTS openmrs;
 ~-~-
 
-USE kisenyi;
+USE openmrs;
 ~-~-
 
 
@@ -3154,8 +3154,8 @@ BEGIN
                           DISTINCT et.encounter_type_id,
                           c.auto_table_column_name AS field_name,
                           c.uuid AS concept_uuid
-                     FROM kisenyi.obs o
-                          INNER JOIN kisenyi.encounter e
+                     FROM openmrs.obs o
+                          INNER JOIN openmrs.encounter e
                             ON e.encounter_id = o.encounter_id
                           INNER JOIN mamba_dim_encounter_type et
                             ON e.encounter_type = et.encounter_type_id
@@ -3468,8 +3468,8 @@ BEGIN
                           DISTINCT et.encounter_type_id,
                           c.auto_table_column_name AS field_name,
                           c.uuid AS concept_uuid
-                     FROM kisenyi.obs o
-                          INNER JOIN kisenyi.encounter e
+                     FROM openmrs.obs o
+                          INNER JOIN openmrs.encounter e
                             ON e.encounter_id = o.encounter_id
                           INNER JOIN mamba_dim_encounter_type et
                             ON e.encounter_type = et.encounter_type_id
@@ -3638,8 +3638,8 @@ BEGIN
 
     DECLARE cursor_encounter_type_name CURSOR FOR
         SELECT DISTINCT et.name
-        FROM kisenyi.obs o
-                 INNER JOIN kisenyi.encounter e ON e.encounter_id = o.encounter_id
+        FROM openmrs.obs o
+                 INNER JOIN openmrs.encounter e ON e.encounter_id = o.encounter_id
                  INNER JOIN mamba_dim_encounter_type et ON e.encounter_type = et.encounter_type_id
         WHERE et.encounter_type_id NOT IN (SELECT DISTINCT tc.encounter_type_id from mamba_flat_table_config tc)
           AND et.retired = 0;
@@ -3689,8 +3689,8 @@ BEGIN
                             DISTINCT et.encounter_type_id,
                             c.auto_table_column_name AS name,
                             c.uuid
-                        FROM kisenyi.obs o
-                        INNER JOIN kisenyi.encounter e
+                        FROM openmrs.obs o
+                        INNER JOIN openmrs.encounter e
                                   ON e.encounter_id = o.encounter_id
                         INNER JOIN mamba_dim_encounter_type et
                                   ON e.encounter_type = et.encounter_type_id
@@ -3702,7 +3702,7 @@ BEGIN
                         ) json_obj,
                        et.uuid as encounter_type_uuid
                     FROM mamba_dim_encounter_type et
-                    INNER JOIN kisenyi.encounter e
+                    INNER JOIN openmrs.encounter e
                         ON e.encounter_type = et.encounter_type_id
                     WHERE et.name = ''', encounter_type_name, '''
                 ) X  ;   ');
@@ -4449,8 +4449,8 @@ BEGIN
 
     DECLARE cursor_encounter_type_name CURSOR FOR
         SELECT DISTINCT et.name
-        FROM kisenyi.obs o
-                 INNER JOIN kisenyi.encounter e ON e.encounter_id = o.encounter_id
+        FROM openmrs.obs o
+                 INNER JOIN openmrs.encounter e ON e.encounter_id = o.encounter_id
                  INNER JOIN mamba_dim_encounter_type et ON e.encounter_type = et.encounter_type_id
         WHERE et.encounter_type_id NOT IN (SELECT DISTINCT tc.encounter_type_id from mamba_flat_table_config_incremental tc)
           AND et.retired = 0;
@@ -4500,8 +4500,8 @@ BEGIN
                             DISTINCT et.encounter_type_id,
                             c.auto_table_column_name AS name,
                             c.uuid
-                        FROM kisenyi.obs o
-                        INNER JOIN kisenyi.encounter e
+                        FROM openmrs.obs o
+                        INNER JOIN openmrs.encounter e
                                   ON e.encounter_id = o.encounter_id
                         INNER JOIN mamba_dim_encounter_type et
                                   ON e.encounter_type = et.encounter_type_id
@@ -4513,7 +4513,7 @@ BEGIN
                         ) json_obj,
                        et.uuid as encounter_type_uuid
                     FROM mamba_dim_encounter_type et
-                    INNER JOIN kisenyi.encounter e
+                    INNER JOIN openmrs.encounter e
                         ON e.encounter_type = et.encounter_type_id
                     WHERE et.name = ''', encounter_type_name, '''
                 ) X  ;   ');
@@ -5304,7 +5304,7 @@ BEGIN
     -- Calculate total records to process
 SELECT COUNT(*)
 INTO total_records
-FROM kisenyi.obs o
+FROM openmrs.obs o
          INNER JOIN mamba_dim_encounter e ON o.encounter_id = e.encounter_id
          INNER JOIN (SELECT DISTINCT concept_id, concept_uuid
                      FROM mamba_concept_metadata) md ON o.concept_id = md.concept_id
@@ -5829,7 +5829,7 @@ BEGIN
     SELECT COLUMN_NAME
     INTO pkey_column
     FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = 'kisenyi'
+    WHERE TABLE_SCHEMA = 'openmrs'
       AND TABLE_NAME = openmrs_table
       AND COLUMN_KEY = 'PRI'
     LIMIT 1;
@@ -5849,7 +5849,7 @@ BEGIN
         -- Check if the column exists in openmrs_table
         IF EXISTS (SELECT 1
                    FROM INFORMATION_SCHEMA.COLUMNS
-                   WHERE TABLE_SCHEMA = 'kisenyi'
+                   WHERE TABLE_SCHEMA = 'openmrs'
                      AND TABLE_NAME = openmrs_table
                      AND COLUMN_NAME = incremental_column_name) THEN
             SET column_list = CONCAT(column_list, incremental_column_name, ', ');
@@ -5865,7 +5865,7 @@ BEGIN
 
     SET @insert_sql = CONCAT(
             'INSERT INTO mamba_etl_incremental_columns_index_all (', column_list, ') ',
-            'SELECT ', select_list, ' FROM kisenyi.', openmrs_table
+            'SELECT ', select_list, ' FROM openmrs.', openmrs_table
                       );
 
     PREPARE stmt FROM @insert_sql;
@@ -6330,11 +6330,11 @@ BEGIN
 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    -- Identify the primary key of the kisenyi table
+    -- Identify the primary key of the openmrs table
     SELECT COLUMN_NAME
     INTO pkey_column
     FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = 'kisenyi'
+    WHERE TABLE_SCHEMA = 'openmrs'
       AND TABLE_NAME = openmrs_table
       AND COLUMN_KEY = 'PRI'
     LIMIT 1;
@@ -6358,7 +6358,7 @@ BEGIN
         -- Check if the column exists in openmrs_table
         IF EXISTS (SELECT 1
                    FROM INFORMATION_SCHEMA.COLUMNS
-                   WHERE TABLE_SCHEMA = 'kisenyi'
+                   WHERE TABLE_SCHEMA = 'openmrs'
                      AND TABLE_NAME = openmrs_table
                      AND COLUMN_NAME = tbl_column_name) THEN
             SET column_list = CONCAT(column_list, tbl_column_name, ', ');
@@ -6382,7 +6382,7 @@ BEGIN
     SET @insert_sql = CONCAT(
             'INSERT INTO ', mamba_table, ' (', column_list, ') ',
             'SELECT ', select_list,
-            ' FROM kisenyi.', openmrs_table, ' tb',
+            ' FROM openmrs.', openmrs_table, ' tb',
             join_clause, ';');
 
     PREPARE stmt FROM @insert_sql;
@@ -6781,7 +6781,7 @@ END;
 UPDATE mamba_dim_location mdl
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON mdl.location_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.location l
+    INNER JOIN openmrs.location l
     ON mdl.location_id = l.location_id
 SET mdl.name               = l.name,
     mdl.description        = l.description,
@@ -7134,7 +7134,7 @@ END;
 UPDATE mamba_dim_patient_identifier_type mdpit
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON mdpit.patient_identifier_type_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.patient_identifier_type pit
+    INNER JOIN openmrs.patient_identifier_type pit
     ON mdpit.patient_identifier_type_id = pit.patient_identifier_type_id
 SET mdpit.name               = pit.name,
     mdpit.description        = pit.description,
@@ -7380,7 +7380,7 @@ END;
 UPDATE mamba_dim_concept_datatype mcd
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON mcd.concept_datatype_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.concept_datatype cd
+    INNER JOIN openmrs.concept_datatype cd
     ON mcd.concept_datatype_id = cd.concept_datatype_id
 SET mcd.name               = cd.name,
     mcd.hl7_abbreviation   = cd.hl7_abbreviation,
@@ -7856,7 +7856,7 @@ END;
 UPDATE mamba_dim_concept tc
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON tc.concept_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.concept sc
+    INNER JOIN openmrs.concept sc
     ON tc.concept_id = sc.concept_id
 SET tc.uuid               = sc.uuid,
     tc.datatype_id        = sc.datatype_id,
@@ -8438,7 +8438,7 @@ SELECT cn.concept_name_id,
        cn.voided_by,
        cn.date_voided,
        cn.void_reason
-FROM kisenyi.concept_name cn
+FROM openmrs.concept_name cn
 WHERE cn.locale IN (SELECT DISTINCT(concepts_locale) FROM _mamba_etl_user_settings)
   AND IF(cn.locale_preferred = 1, cn.locale_preferred = 1, cn.concept_name_type = 'FULLY_SPECIFIED')
   AND cn.voided = 0;
@@ -8596,7 +8596,7 @@ SELECT cn.concept_name_id,
        cn.date_voided,
        cn.void_reason,
        1
-FROM kisenyi.concept_name cn
+FROM openmrs.concept_name cn
          INNER JOIN mamba_etl_incremental_columns_index_new ic
                     ON cn.concept_name_id = ic.incremental_table_pkey
 WHERE cn.locale IN (SELECT DISTINCT (concepts_locale) FROM _mamba_etl_user_settings)
@@ -8646,7 +8646,7 @@ END;
 UPDATE mamba_dim_concept_name cn
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON cn.concept_name_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.concept_name cnm
+    INNER JOIN openmrs.concept_name cnm
     ON cn.concept_name_id = cnm.concept_name_id
 SET cn.concept_id         = cnm.concept_id,
     cn.name               = cnm.name,
@@ -9123,7 +9123,7 @@ END;
 UPDATE mamba_dim_encounter_type et
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON et.encounter_type_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.encounter_type ent
+    INNER JOIN openmrs.encounter_type ent
     ON et.encounter_type_id = ent.encounter_type_id
 SET et.uuid               = ent.uuid,
     et.name               = ent.name,
@@ -9410,7 +9410,7 @@ SELECT e.encounter_id,
        e.voided,
        e.voided_by,
        e.void_reason
-FROM kisenyi.encounter e
+FROM openmrs.encounter e
          INNER JOIN mamba_dim_encounter_type et
                     ON e.encounter_type = et.encounter_type_id
 WHERE et.uuid
@@ -9571,7 +9571,7 @@ SELECT e.encounter_id,
        e.voided_by,
        e.void_reason,
        1
-FROM kisenyi.encounter e
+FROM openmrs.encounter e
          INNER JOIN mamba_etl_incremental_columns_index_new ic
                     ON e.encounter_id = ic.incremental_table_pkey
          INNER JOIN mamba_dim_encounter_type et
@@ -9621,7 +9621,7 @@ END;
 UPDATE mamba_dim_encounter e
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON e.encounter_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.encounter enc
+    INNER JOIN openmrs.encounter enc
     ON e.encounter_id = enc.encounter_id
     INNER JOIN mamba_dim_encounter_type et
     ON e.encounter_type = et.encounter_type_id
@@ -10177,7 +10177,7 @@ END;
 UPDATE mamba_dim_person p
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON p.person_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.person psn
+    INNER JOIN openmrs.person psn
     ON p.person_id = psn.person_id
 SET p.birthdate           = psn.birthdate,
     p.birthdate_estimated = psn.birthdate_estimated,
@@ -10527,7 +10527,7 @@ END;
 UPDATE mamba_dim_person_attribute mpa
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON mpa.person_attribute_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.person_attribute pa
+    INNER JOIN openmrs.person_attribute pa
     ON mpa.person_attribute_id = pa.person_attribute_id
 SET mpa.person_attribute_id = pa.person_attribute_id,
     mpa.person_id           = pa.person_id,
@@ -10862,7 +10862,7 @@ END;
 UPDATE mamba_dim_person_attribute_type mpat
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON mpat.person_attribute_type_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.person_attribute_type pat
+    INNER JOIN openmrs.person_attribute_type pat
     ON mpat.person_attribute_type_id = pat.person_attribute_type_id
 SET mpat.name               = pat.name,
     mpat.description        = pat.description,
@@ -11203,7 +11203,7 @@ END;
 UPDATE mamba_dim_patient_identifier mpi
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON mpi.patient_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.patient_identifier pi
+    INNER JOIN openmrs.patient_identifier pi
     ON mpi.patient_id = pi.patient_id
 SET mpi.patient_id         = pi.patient_id,
     mpi.identifier         = pi.identifier,
@@ -11506,7 +11506,7 @@ END;
 UPDATE mamba_dim_person_name dpn
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON dpn.person_name_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.person_name pn
+    INNER JOIN openmrs.person_name pn
     ON dpn.person_name_id = pn.person_name_id
 SET dpn.person_name_id     = pn.person_name_id,
     dpn.person_id          = pn.person_id,
@@ -11827,7 +11827,7 @@ END;
 UPDATE mamba_dim_person_address mpa
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON mpa.person_address_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.person_address pa
+    INNER JOIN openmrs.person_address pa
     ON mpa.person_address_id = pa.person_address_id
 SET mpa.person_id          = pa.person_id,
     mpa.preferred          = pa.preferred,
@@ -12182,7 +12182,7 @@ END;
 UPDATE mamba_dim_users u
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON u.user_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.users us
+    INNER JOIN openmrs.users us
     ON u.user_id = us.user_id
 SET u.system_id          = us.system_id,
     u.username           = us.username,
@@ -12519,7 +12519,7 @@ END;
 UPDATE mamba_dim_relationship r
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON r.relationship_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.relationship rel
+    INNER JOIN openmrs.relationship rel
     ON r.relationship_id = rel.relationship_id
 SET r.relationship       = rel.relationship,
     r.person_a           = rel.person_a,
@@ -12878,7 +12878,7 @@ END;
 UPDATE mamba_dim_orders do
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON do.order_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.orders o
+    INNER JOIN openmrs.orders o
     ON do.order_id = o.order_id
 SET do.order_id               = o.order_id,
     do.uuid                   = o.uuid,
@@ -13296,7 +13296,7 @@ BEGIN
            o.voided,
            o.voided_by,
            o.void_reason
-    FROM kisenyi.obs o
+    FROM openmrs.obs o
              INNER JOIN mamba_dim_encounter e ON o.encounter_id = e.encounter_id
              INNER JOIN (SELECT DISTINCT concept_id, concept_uuid
                          FROM mamba_concept_metadata) md ON o.concept_id = md.concept_id
@@ -13613,7 +13613,7 @@ SELECT o.obs_id,
        o.voided_by,
        o.void_reason,
        1
-FROM kisenyi.obs o
+FROM openmrs.obs o
          INNER JOIN mamba_etl_incremental_columns_index_new ic ON o.obs_id = ic.incremental_table_pkey
          INNER JOIN mamba_dim_encounter e ON o.encounter_id = e.encounter_id
          INNER JOIN (SELECT DISTINCT concept_id, concept_uuid
@@ -13665,7 +13665,7 @@ END;
 UPDATE mamba_z_encounter_obs z
     INNER JOIN mamba_etl_incremental_columns_index_modified im
     ON z.obs_id = im.incremental_table_pkey
-    INNER JOIN kisenyi.obs o
+    INNER JOIN openmrs.obs o
     ON z.obs_id = o.obs_id
 SET z.encounter_id            = o.encounter_id,
     z.person_id               = o.person_id,
@@ -14201,175 +14201,6 @@ DELIMITER ;
 
         
 -- ---------------------------------------------------------------------------------------------
--- ----------------------  sp_mamba_dim_concept_name  ----------------------------
--- ---------------------------------------------------------------------------------------------
-
-DROP PROCEDURE IF EXISTS sp_mamba_dim_concept_name;
-
-DELIMITER //
-
-~
-CREATE PROCEDURE sp_mamba_dim_concept_name()
-BEGIN
-
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-    GET DIAGNOSTICS CONDITION 1
-
-    @message_text = MESSAGE_TEXT,
-    @mysql_errno = MYSQL_ERRNO,
-    @returned_sqlstate = RETURNED_SQLSTATE;
-
-    CALL sp_mamba_etl_error_log_insert('sp_mamba_dim_concept_name', @message_text, @mysql_errno, @returned_sqlstate);
-
-    UPDATE _mamba_etl_schedule
-    SET end_time                   = NOW(),
-        completion_status          = 'ERROR',
-        transaction_status         = 'COMPLETED',
-        success_or_error_message   = CONCAT('sp_mamba_dim_concept_name', ', ', @mysql_errno, ', ', @message_text)
-        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
-
-    RESIGNAL;
-END;
-
--- $BEGIN
-
-CALL sp_mamba_dim_concept_name_create();
-CALL sp_mamba_dim_concept_name_insert();
-
--- $END
-END //
-
-DELIMITER ;
-
-        
--- ---------------------------------------------------------------------------------------------
--- ----------------------  sp_mamba_dim_concept_name_create  ----------------------------
--- ---------------------------------------------------------------------------------------------
-
-DROP PROCEDURE IF EXISTS sp_mamba_dim_concept_name_create;
-
-DELIMITER //
-
-~
-CREATE PROCEDURE sp_mamba_dim_concept_name_create()
-BEGIN
-
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-    GET DIAGNOSTICS CONDITION 1
-
-    @message_text = MESSAGE_TEXT,
-    @mysql_errno = MYSQL_ERRNO,
-    @returned_sqlstate = RETURNED_SQLSTATE;
-
-    CALL sp_mamba_etl_error_log_insert('sp_mamba_dim_concept_name_create', @message_text, @mysql_errno, @returned_sqlstate);
-
-    UPDATE _mamba_etl_schedule
-    SET end_time                   = NOW(),
-        completion_status          = 'ERROR',
-        transaction_status         = 'COMPLETED',
-        success_or_error_message   = CONCAT('sp_mamba_dim_concept_name_create', ', ', @mysql_errno, ', ', @message_text)
-        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
-
-    RESIGNAL;
-END;
-
--- $BEGIN
-
-CREATE TABLE mamba_dim_concept_name
-(
-    id                INT          NOT NULL AUTO_INCREMENT,
-    concept_name_id   INT          NOT NULL,
-    concept_id        INT,
-    name              VARCHAR(255) NOT NULL,
-    locale            VARCHAR(50)  NOT NULL,
-    locale_preferred  TINYINT,
-    concept_name_type VARCHAR(255),
-
-    PRIMARY KEY (id)
-)
-    CHARSET = UTF8;
-
-CREATE INDEX mamba_dim_concept_name_concept_name_id_index
-    ON mamba_dim_concept_name (concept_name_id);
-
-CREATE INDEX mamba_dim_concept_name_concept_id_index
-    ON mamba_dim_concept_name (concept_id);
-
-CREATE INDEX mamba_dim_concept_name_concept_name_type_index
-    ON mamba_dim_concept_name (concept_name_type);
-
-CREATE INDEX mamba_dim_concept_name_locale_index
-    ON mamba_dim_concept_name (locale);
-
-CREATE INDEX mamba_dim_concept_name_locale_preferred_index
-    ON mamba_dim_concept_name (locale_preferred);
-
--- $END
-END //
-
-DELIMITER ;
-
-        
--- ---------------------------------------------------------------------------------------------
--- ----------------------  sp_mamba_dim_concept_name_insert  ----------------------------
--- ---------------------------------------------------------------------------------------------
-
-DROP PROCEDURE IF EXISTS sp_mamba_dim_concept_name_insert;
-
-DELIMITER //
-
-~
-CREATE PROCEDURE sp_mamba_dim_concept_name_insert()
-BEGIN
-
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-    GET DIAGNOSTICS CONDITION 1
-
-    @message_text = MESSAGE_TEXT,
-    @mysql_errno = MYSQL_ERRNO,
-    @returned_sqlstate = RETURNED_SQLSTATE;
-
-    CALL sp_mamba_etl_error_log_insert('sp_mamba_dim_concept_name_insert', @message_text, @mysql_errno, @returned_sqlstate);
-
-    UPDATE _mamba_etl_schedule
-    SET end_time                   = NOW(),
-        completion_status          = 'ERROR',
-        transaction_status         = 'COMPLETED',
-        success_or_error_message   = CONCAT('sp_mamba_dim_concept_name_insert', ', ', @mysql_errno, ', ', @message_text)
-        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
-
-    RESIGNAL;
-END;
-
--- $BEGIN
-
-INSERT INTO mamba_dim_concept_name (concept_name_id,
-                                    concept_id,
-                                    name,
-                                    locale,
-                                    locale_preferred,
-                                    concept_name_type)
-SELECT cn.concept_name_id,
-       cn.concept_id,
-       cn.name,
-       cn.locale,
-       cn.locale_preferred,
-       cn.concept_name_type
-FROM concept_name cn
- WHERE cn.locale = 'en'
-    AND cn.voided = 0
-    AND IF(cn.locale_preferred = 1, cn.locale_preferred = 1, cn.concept_name_type = 'FULLY_SPECIFIED');
-
--- $END
-END //
-
-DELIMITER ;
-
-        
--- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_mamba_z_encounter_obs_insert  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -14412,7 +14243,7 @@ BEGIN
            o.voided,
            o.voided_by,
            o.void_reason
-    FROM kisenyi.obs o
+    FROM openmrs.obs o
              INNER JOIN mamba_dim_encounter e ON o.encounter_id = e.encounter_id
              INNER JOIN (SELECT DISTINCT concept_id, concept_uuid
                          FROM mamba_concept_metadata) md ON o.concept_id = md.concept_id
@@ -14672,6 +14503,59 @@ END;
 END //
 
 DELIMITER ;
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_system_drop_fact_tables  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_system_drop_fact_tables;
+
+DELIMITER //
+
+-- CREATE PROCEDURE sp_mamba_system_drop_all_tables(IN database_name CHAR(255) CHARACTER SET UTF8MB4)
+~
+CREATE PROCEDURE sp_mamba_system_drop_fact_tables()
+BEGIN
+
+    DECLARE tables_count INT;
+
+    SET @database_name = (SELECT DATABASE());
+
+    SELECT COUNT(1)
+    INTO tables_count
+    FROM information_schema.tables
+    WHERE TABLE_TYPE = 'BASE TABLE'
+      AND TABLE_SCHEMA = @database_name;
+
+    IF tables_count > 0 THEN
+
+        SET session group_concat_max_len = 20000;
+
+        SET @tbls = (SELECT GROUP_CONCAT(@database_name, '.', TABLE_NAME SEPARATOR ', ')
+                     FROM information_schema.tables
+                     WHERE TABLE_TYPE = 'BASE TABLE'
+                       AND TABLE_SCHEMA = @database_name
+                       AND TABLE_NAME REGEXP '^(fact_)');
+
+        IF (@tbls IS NOT NULL) THEN
+
+            SET @drop_tables = CONCAT('DROP TABLE IF EXISTS ', @tbls);
+
+            SET foreign_key_checks = 0; -- Remove check, so we don't have to drop tables in the correct order, or care if they exist or not.
+            PREPARE drop_tbls FROM @drop_tables;
+            EXECUTE drop_tbls;
+            DEALLOCATE PREPARE drop_tbls;
+            SET foreign_key_checks = 1;
+
+        END IF;
+
+    END IF;
+
+END //
+
+DELIMITER ;
+
 
         
 -- ---------------------------------------------------------------------------------------------
@@ -27067,4 +26951,4 @@ CREATE EVENT IF NOT EXISTS _mamba_etl_scheduler_event
 
  ~-~-
 
-USE kisenyi;
+USE openmrs;

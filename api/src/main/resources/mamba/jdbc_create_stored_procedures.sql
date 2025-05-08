@@ -13952,172 +13952,6 @@ END;
 
         
 -- ---------------------------------------------------------------------------------------------
--- ----------------------  sp_mamba_dim_concept_name  ----------------------------
--- ---------------------------------------------------------------------------------------------
-
-DROP PROCEDURE IF EXISTS sp_mamba_dim_concept_name;
-
-
-~-~-
-CREATE PROCEDURE sp_mamba_dim_concept_name()
-BEGIN
-
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-    GET DIAGNOSTICS CONDITION 1
-
-    @message_text = MESSAGE_TEXT,
-    @mysql_errno = MYSQL_ERRNO,
-    @returned_sqlstate = RETURNED_SQLSTATE;
-
-    CALL sp_mamba_etl_error_log_insert('sp_mamba_dim_concept_name', @message_text, @mysql_errno, @returned_sqlstate);
-
-    UPDATE _mamba_etl_schedule
-    SET end_time                   = NOW(),
-        completion_status          = 'ERROR',
-        transaction_status         = 'COMPLETED',
-        success_or_error_message   = CONCAT('sp_mamba_dim_concept_name', ', ', @mysql_errno, ', ', @message_text)
-        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
-
-    RESIGNAL;
-END;
-
--- $BEGIN
-
-CALL sp_mamba_dim_concept_name_create();
-CALL sp_mamba_dim_concept_name_insert();
-
--- $END
-END;
-~-~-
-
-
-        
--- ---------------------------------------------------------------------------------------------
--- ----------------------  sp_mamba_dim_concept_name_create  ----------------------------
--- ---------------------------------------------------------------------------------------------
-
-DROP PROCEDURE IF EXISTS sp_mamba_dim_concept_name_create;
-
-
-~-~-
-CREATE PROCEDURE sp_mamba_dim_concept_name_create()
-BEGIN
-
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-    GET DIAGNOSTICS CONDITION 1
-
-    @message_text = MESSAGE_TEXT,
-    @mysql_errno = MYSQL_ERRNO,
-    @returned_sqlstate = RETURNED_SQLSTATE;
-
-    CALL sp_mamba_etl_error_log_insert('sp_mamba_dim_concept_name_create', @message_text, @mysql_errno, @returned_sqlstate);
-
-    UPDATE _mamba_etl_schedule
-    SET end_time                   = NOW(),
-        completion_status          = 'ERROR',
-        transaction_status         = 'COMPLETED',
-        success_or_error_message   = CONCAT('sp_mamba_dim_concept_name_create', ', ', @mysql_errno, ', ', @message_text)
-        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
-
-    RESIGNAL;
-END;
-
--- $BEGIN
-
-CREATE TABLE mamba_dim_concept_name
-(
-    id                INT          NOT NULL AUTO_INCREMENT,
-    concept_name_id   INT          NOT NULL,
-    concept_id        INT,
-    name              VARCHAR(255) NOT NULL,
-    locale            VARCHAR(50)  NOT NULL,
-    locale_preferred  TINYINT,
-    concept_name_type VARCHAR(255),
-
-    PRIMARY KEY (id)
-)
-    CHARSET = UTF8;
-
-CREATE INDEX mamba_dim_concept_name_concept_name_id_index
-    ON mamba_dim_concept_name (concept_name_id);
-
-CREATE INDEX mamba_dim_concept_name_concept_id_index
-    ON mamba_dim_concept_name (concept_id);
-
-CREATE INDEX mamba_dim_concept_name_concept_name_type_index
-    ON mamba_dim_concept_name (concept_name_type);
-
-CREATE INDEX mamba_dim_concept_name_locale_index
-    ON mamba_dim_concept_name (locale);
-
-CREATE INDEX mamba_dim_concept_name_locale_preferred_index
-    ON mamba_dim_concept_name (locale_preferred);
-
--- $END
-END;
-~-~-
-
-
-        
--- ---------------------------------------------------------------------------------------------
--- ----------------------  sp_mamba_dim_concept_name_insert  ----------------------------
--- ---------------------------------------------------------------------------------------------
-
-DROP PROCEDURE IF EXISTS sp_mamba_dim_concept_name_insert;
-
-
-~-~-
-CREATE PROCEDURE sp_mamba_dim_concept_name_insert()
-BEGIN
-
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-    GET DIAGNOSTICS CONDITION 1
-
-    @message_text = MESSAGE_TEXT,
-    @mysql_errno = MYSQL_ERRNO,
-    @returned_sqlstate = RETURNED_SQLSTATE;
-
-    CALL sp_mamba_etl_error_log_insert('sp_mamba_dim_concept_name_insert', @message_text, @mysql_errno, @returned_sqlstate);
-
-    UPDATE _mamba_etl_schedule
-    SET end_time                   = NOW(),
-        completion_status          = 'ERROR',
-        transaction_status         = 'COMPLETED',
-        success_or_error_message   = CONCAT('sp_mamba_dim_concept_name_insert', ', ', @mysql_errno, ', ', @message_text)
-        WHERE id = (SELECT last_etl_schedule_insert_id FROM _mamba_etl_user_settings ORDER BY id DESC LIMIT 1);
-
-    RESIGNAL;
-END;
-
--- $BEGIN
-
-INSERT INTO mamba_dim_concept_name (concept_name_id,
-                                    concept_id,
-                                    name,
-                                    locale,
-                                    locale_preferred,
-                                    concept_name_type)
-SELECT cn.concept_name_id,
-       cn.concept_id,
-       cn.name,
-       cn.locale,
-       cn.locale_preferred,
-       cn.concept_name_type
-FROM concept_name cn
- WHERE cn.locale = 'en'
-    AND cn.voided = 0
-    AND IF(cn.locale_preferred = 1, cn.locale_preferred = 1, cn.concept_name_type = 'FULLY_SPECIFIED');
-
--- $END
-END;
-~-~-
-
-
-        
--- ---------------------------------------------------------------------------------------------
 -- ----------------------  sp_mamba_z_encounter_obs_insert  ----------------------------
 -- ---------------------------------------------------------------------------------------------
 
@@ -14414,6 +14248,58 @@ END;
 -- $END
 END;
 ~-~-
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_system_drop_fact_tables  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_system_drop_fact_tables;
+
+
+-- CREATE PROCEDURE sp_mamba_system_drop_all_tables(IN database_name CHAR(255) CHARACTER SET UTF8MB4)
+~-~-
+CREATE PROCEDURE sp_mamba_system_drop_fact_tables()
+BEGIN
+
+    DECLARE tables_count INT;
+
+    SET @database_name = (SELECT DATABASE());
+
+    SELECT COUNT(1)
+    INTO tables_count
+    FROM information_schema.tables
+    WHERE TABLE_TYPE = 'BASE TABLE'
+      AND TABLE_SCHEMA = @database_name;
+
+    IF tables_count > 0 THEN
+
+        SET session group_concat_max_len = 20000;
+
+        SET @tbls = (SELECT GROUP_CONCAT(@database_name, '.', TABLE_NAME SEPARATOR ', ')
+                     FROM information_schema.tables
+                     WHERE TABLE_TYPE = 'BASE TABLE'
+                       AND TABLE_SCHEMA = @database_name
+                       AND TABLE_NAME REGEXP '^(fact_)');
+
+        IF (@tbls IS NOT NULL) THEN
+
+            SET @drop_tables = CONCAT('DROP TABLE IF EXISTS ', @tbls);
+
+            SET foreign_key_checks = 0; -- Remove check, so we don't have to drop tables in the correct order, or care if they exist or not.
+            PREPARE drop_tbls FROM @drop_tables;
+            EXECUTE drop_tbls;
+            DEALLOCATE PREPARE drop_tbls;
+            SET foreign_key_checks = 1;
+
+        END IF;
+
+    END IF;
+
+END;
+~-~-
+
 
 
         

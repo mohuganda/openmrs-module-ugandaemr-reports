@@ -13,12 +13,6 @@ derived/non_suppressed/sp_data_processing_derived_non_suppressed.sql
 derived/IIT/sp_data_processing_derived_IIT.sql
 derived/hts/sp_data_processing_derived_hts.sql
 
-#############################################################################
-############################ dimensions folder SPs  ############################
-#############################################################################
-dimensions/dim_concept_name/sp_mamba_dim_concept_name.sql
-dimensions/dim_concept_name/sp_mamba_dim_concept_name_create.sql
-dimensions/dim_concept_name/sp_mamba_dim_concept_name_insert.sql
 
 derived/z_obs/sp_mamba_z_encounter_obs_insert.sql
 
@@ -27,6 +21,8 @@ derived/etl_obs_group/sp_mamba_obs_group_create.sql
 derived/etl_obs_group/sp_mamba_obs_group_insert.sql
 derived/etl_obs_group/sp_mamba_obs_group_update.sql
 
+
+xf_system/sp_mamba_system_drop_fact_tables.sql
 #############################################################################
 ##### A single SP that CALLs all SPs inside the derived & base folders ######
 #############################################################################
