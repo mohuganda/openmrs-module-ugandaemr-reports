@@ -21,10 +21,10 @@
     </organization>
 
     <scm>
-        <connection>scm:git:git@github.com:METS-Programme/openmrs-module-ugandaemr-reports.git</connection>
-        <developerConnection>scm:git:git@github.com:METS-Programme/openmrs-module-ugandaemr-reports.git
+        <connection>scm:git:git@github.com:mohuganda/openmrs-module-ugandaemr-reports.git</connection>
+        <developerConnection>scm:git:git@github.com:mohuganda/openmrs-module-ugandaemr-reports.git
         </developerConnection>
-        <url>scm:git:https://github.com/METS-Programme/openmrs-module-ugandaemr-reports</url>
+        <url>scm:git:https://github.com/mohuganda/openmrs-module-ugandaemr-reports.git</url>
         <tag>2.0.36-SNAPSHOT</tag>
     </scm>
 
