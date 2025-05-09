@@ -30,6 +30,18 @@ CREATE TABLE mamba_fact_encounter_non_suppressed_card
     tb_lam_test_done                       VARCHAR(80) NULL,
     date_hivr_results_recieved_at_facility DATE NULL,
     hivdr_results                          TEXT NULL,
+    emtct                      VARCHAR(80) NULL,
+    pregnant_status               VARCHAR(100) NULL,
+    diagnosed_with_cryptococcal_meningitis    VARCHAR(100) NULL,
+    treated_for_ccm       VARCHAR(30) NULL,
+    histoplasmosis_screening  VARCHAR(80) NULL,
+    histoplasmosis_results    VARCHAR(255) NULL,
+    aspergillosis_screening       VARCHAR(80) NULL,
+    other_clinical_decision          VARCHAR(80) NULL,
+    date_of_decision          DATE NULL,
+    outcome                   VARCHAR(100) NULL,
+    other_outcome              TEXT,
+    comments                  TEXT,
         PRIMARY KEY (id)
 ) CHARSET = UTF8;
 
