@@ -17,7 +17,17 @@ INSERT INTO mamba_fact_encounter_hiv_art_health_education (encounter_id,
                                                        scheduled_patient_visit,
                                                        health_education_setting,
                                                        clinical_impression_comment,
-                                                       health_education_disclosure)
+                                                       health_education_disclosure,
+                                                           ovc_no        ,
+                                                           patient_categorization,
+                                                           dsdm_models       ,
+                                                           dsdm_approach     ,
+                                                           other_gmh_approach   ,
+                                                           other_imc_approach   ,
+                                                           other_gmc_approach    ,
+                                                           other_imf_approach    ,
+                                                           linkages_and_referrals1   ,
+                                                           arrange   )
 SELECT encounter_id,
        client_id,
        encounter_datetime,
@@ -36,7 +46,17 @@ SELECT encounter_id,
        scheduled_patient_visit,
        health_education_setting,
        clinical_impression_comment,
-       health_education_disclosure
+       health_education_disclosure,
+       ovc_no        ,
+       patient_categorization,
+       dsdm_models       ,
+       dsdm_approach     ,
+       other_gmh_approach   ,
+       other_imc_approach   ,
+       other_gmc_approach    ,
+       other_imf_approach    ,
+       linkages_and_referrals1   ,
+       arrange
 
 
 FROM mamba_flat_encounter_art_health_education;

@@ -21,6 +21,16 @@ CREATE TABLE mamba_fact_encounter_hiv_art_health_education
     health_education_setting    VARCHAR(255)  DEFAULT NULL,
     clinical_impression_comment TEXT  DEFAULT NULL,
     health_education_disclosure VARCHAR(255)  DEFAULT NULL,
+    ovc_no         VARCHAR(100)  DEFAULT NULL,
+    patient_categorization VARCHAR(255)  DEFAULT NULL,
+    dsdm_models       VARCHAR(255)  DEFAULT NULL,
+    dsdm_approach     VARCHAR(255)  DEFAULT NULL,
+    other_gmh_approach    VARCHAR(255)  DEFAULT NULL,
+    other_imc_approach    VARCHAR(255)  DEFAULT NULL,
+    other_gmc_approach    VARCHAR(255)  DEFAULT NULL,
+    other_imf_approach    VARCHAR(255)  DEFAULT NULL,
+    linkages_and_referrals1    VARCHAR(255)  DEFAULT NULL,
+    arrange   VARCHAR(255)  DEFAULT NULL,
 
     PRIMARY KEY (id)
 ) CHARSET = UTF8;
