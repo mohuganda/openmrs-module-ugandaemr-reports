@@ -98,6 +98,6 @@ public class Setup106A1A2024Report extends AggregateReportDataExportManager {
 
     @Override
     public String getVersion() {
-        return "1.0.11";
+        return "1.0.12";
     }
 }
