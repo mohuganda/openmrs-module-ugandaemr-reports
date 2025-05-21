@@ -71,10 +71,12 @@ INSERT INTO mamba_fact_encounter_hiv_art_summary (encounter_id,
                                                   earlier_arv_not_transfer_duration_in_months,
                                                   family_member_hiv_status,
                                                   family_member_hiv_test_date,
-                                                  hiv_enrollment_date)
-SELECT encounter_id,
-       client_id,
-       encounter_datetime,
+                                                  hiv_enrollment_date,
+                                                  relationship_to_index_clients,
+                                                  other_relationship_to_index_client)
+SELECT a.encounter_id,
+       a.client_id,
+       a.encounter_datetime,
        allergy,
        hepatitis_b_test_qualitative,
        hepatitis_c_test_qualitative,
@@ -144,6 +146,8 @@ SELECT encounter_id,
        earlier_arv_not_transfer_duration_in_months,
        family_member_hiv_status,
        family_member_hiv_test_date,
-       hiv_enrollment_date
-FROM mamba_flat_encounter_art_summary_card;
+       hiv_enrollment_date,
+       relationship_to_index_clients,
+       other_relationship_to_index_client
+FROM mamba_flat_encounter_art_summary_card a left join mamba_flat_encounter_art_summary_card_1 b on a.encounter_id = b.encounter_id ;
 -- $END

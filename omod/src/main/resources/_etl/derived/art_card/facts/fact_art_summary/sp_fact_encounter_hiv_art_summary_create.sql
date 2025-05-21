@@ -75,6 +75,8 @@ CREATE TABLE mamba_fact_encounter_hiv_art_summary
     family_member_hiv_status                    VARCHAR(255) NULL,
     family_member_hiv_test_date                 DATE NULL,
     hiv_enrollment_date                         DATE NULL,
+    relationship_to_index_clients             VARCHAR(255) NULL,
+    other_relationship_to_index_client        VARCHAR(255) NULL,
 
     PRIMARY KEY (id)
 ) CHARSET = UTF8;
