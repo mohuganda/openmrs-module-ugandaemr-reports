@@ -11,7 +11,6 @@ CREATE TABLE mamba_dim_agegroup
     moh_age_val   INT        NULL,
     moh_2024_age_group VARCHAR(50) NULL,
     moh_2024_age_val   INT        NULL,
-
     PRIMARY KEY (id)
 )
     CHARSET = UTF8MB4;

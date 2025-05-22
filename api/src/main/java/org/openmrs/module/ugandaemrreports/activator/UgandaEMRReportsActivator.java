@@ -20,8 +20,9 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
-import org.openmrs.module.ugandaemrreports.reports.AggregateReportDataExportManager;
+import org.openmrs.module.mambacore.api.FlattenDatabaseService;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
@@ -41,6 +42,7 @@ public class UgandaEMRReportsActivator extends BaseModuleActivator {
 	@Override
 	public void started() {
 		log.info("UgandaEMR Reports module started - initializing...");
+		Context.getService(FlattenDatabaseService.class).setupEtl();
 		for (Initializer initializer : getInitializers()) {
 			initializer.started();
 		}
@@ -48,6 +50,7 @@ public class UgandaEMRReportsActivator extends BaseModuleActivator {
 
 	@Override
 	public void stopped() {
+		Context.getService(FlattenDatabaseService.class).shutdownEtlThread();
 		for (int i = getInitializers().size() - 1; i >= 0; i--) {
 			getInitializers().get(i).stopped();
 		}
