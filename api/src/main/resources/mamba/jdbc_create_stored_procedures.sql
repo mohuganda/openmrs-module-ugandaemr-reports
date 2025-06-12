@@ -2336,21 +2336,27 @@ BEGIN
                 SELECT JSON_EXTRACT(@report_array, CONCAT('$[', @report_count, ']')) INTO @report;
                 SELECT JSON_UNQUOTE(JSON_EXTRACT(@report, '$.report_name')) INTO @report_name;
                 SELECT JSON_UNQUOTE(JSON_EXTRACT(@report, '$.report_id')) INTO @report_id;
+
                 SELECT CONCAT('sp_mamba_report_', @report_id, '_query') INTO @report_procedure_name;
                 SELECT CONCAT('sp_mamba_report_', @report_id, '_columns_query') INTO @report_columns_procedure_name;
+                SELECT CONCAT('sp_mamba_report_', @report_id, '_size_query') INTO @report_size_procedure_name;
                 SELECT CONCAT('mamba_report_', @report_id) INTO @table_name;
+
                 SELECT JSON_UNQUOTE(JSON_EXTRACT(@report, CONCAT('$.report_sql.sql_query'))) INTO @sql_query;
                 SELECT JSON_EXTRACT(@report, CONCAT('$.report_sql.query_params')) INTO @query_params_array;
+                SELECT JSON_EXTRACT(@report, CONCAT('$.report_sql.paginate')) INTO @paginate_flag;
 
                 INSERT INTO mamba_dim_report_definition(report_id,
                                                         report_procedure_name,
                                                         report_columns_procedure_name,
+                                                        report_size_procedure_name,
                                                         sql_query,
                                                         table_name,
                                                         report_name)
                 VALUES (@report_id,
                         @report_procedure_name,
                         @report_columns_procedure_name,
+                        @report_size_procedure_name,
                         @sql_query,
                         @table_name,
                         @report_name);
@@ -2379,50 +2385,31 @@ BEGIN
                         SET @param_count = @param_position;
                     END WHILE;
 
+                -- Handle pagination parameters if paginate flag is true
+                IF @paginate_flag = TRUE OR @paginate_flag = 'true' THEN
+                    -- Add page_number parameter
+                    SET @page_number_position = @total_params + 1;
+                    INSERT INTO mamba_dim_report_definition_parameters(report_id,
+                                                                      parameter_name,
+                                                                      parameter_type,
+                                                                      parameter_position)
+                    VALUES (@report_id,
+                            'page_number',
+                            'INT',
+                            @page_number_position);
+                            
+                    -- Add page_size parameter
+                    SET @page_size_position = @total_params + 2;
+                    INSERT INTO mamba_dim_report_definition_parameters(report_id,
+                                                                      parameter_name,
+                                                                      parameter_type,
+                                                                      parameter_position)
+                    VALUES (@report_id,
+                            'page_size',
+                            'INT',
+                            @page_size_position);
+                END IF;
 
---                SELECT GROUP_CONCAT(COLUMN_NAME SEPARATOR ', ')
---                INTO @column_names
---                FROM INFORMATION_SCHEMA.COLUMNS
---                -- WHERE TABLE_SCHEMA = 'alive' TODO: add back after verifying schema name
---                WHERE TABLE_NAME = @report_id;
---
---                SET @drop_table = CONCAT('DROP TABLE IF EXISTS `', @report_id, '`');
---
---                SET @createtb = CONCAT('CREATE TEMP TABLE AS SELECT ', @report_id, ';', CHAR(10),
---                                       'CREATE PROCEDURE ', @report_procedure_name, '(', CHAR(10),
---                                       @parameters, CHAR(10),
---                                       ')', CHAR(10),
---                                       'BEGIN', CHAR(10),
---                                       @sql_query, CHAR(10),
---                                       'END;', CHAR(10));
---
---                PREPARE deletetb FROM @drop_table;
---                PREPARE createtb FROM @create_table;
---
---               EXECUTE deletetb;
---               EXECUTE createtb;
---
---                DEALLOCATE PREPARE deletetb;
---                DEALLOCATE PREPARE createtb;
-
-                --                SELECT GROUP_CONCAT(CONCAT('IN ', parameter_name, ' ', parameter_type) SEPARATOR ', ')
---                INTO @parameters
---                FROM mamba_dim_report_definition_parameters
---                WHERE report_id = @report_id
---                ORDER BY parameter_position;
---
---                SET @procedure_definition = CONCAT('DROP PROCEDURE IF EXISTS ', @report_procedure_name, ';', CHAR(10),
---                                                   'CREATE PROCEDURE ', @report_procedure_name, '(', CHAR(10),
---                                                   @parameters, CHAR(10),
---                                                   ')', CHAR(10),
---                                                   'BEGIN', CHAR(10),
---                                                   @sql_query, CHAR(10),
---                                                   'END;', CHAR(10));
---
---                PREPARE CREATE_PROC FROM @procedure_definition;
---                EXECUTE CREATE_PROC;
---                DEALLOCATE PREPARE CREATE_PROC;
---
                 SET @report_count = @report_count + 1;
             END WHILE;
 
@@ -2470,6 +2457,71 @@ BEGIN
                          FROM mamba_dim_report_definition rd
                          WHERE rd.report_id = report_identifier);
     END IF;
+
+    OPEN cursor_parameter_names;
+    read_loop:
+    LOOP
+        FETCH cursor_parameter_names INTO arg_name;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        SET arg_value = IFNULL((JSON_EXTRACT(parameter_list, CONCAT('$[', ((SELECT p.parameter_position
+                                                                            FROM mamba_dim_report_definition_parameters p
+                                                                            WHERE p.parameter_name = arg_name
+                                                                              AND p.report_id = report_identifier) - 1),
+                                                                    '].value'))), 'NULL');
+        SET tester = CONCAT_WS(', ', tester, arg_value);
+        SET sql_args = IFNULL(CONCAT_WS(', ', sql_args, arg_value), NULL);
+
+    END LOOP;
+
+    CLOSE cursor_parameter_names;
+
+    SET @sql = CONCAT('CALL ', proc_name, '(', IFNULL(sql_args, ''), ')');
+
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+
+END;
+~-~-
+
+
+
+        
+-- ---------------------------------------------------------------------------------------------
+-- ----------------------  sp_mamba_generate_report_size_sp_wrapper  ----------------------------
+-- ---------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS sp_mamba_generate_report_size_sp_wrapper;
+
+
+~-~-
+CREATE PROCEDURE sp_mamba_generate_report_size_sp_wrapper(
+    IN report_identifier VARCHAR(255),
+    IN parameter_list JSON)
+BEGIN
+
+    DECLARE proc_name VARCHAR(255);
+    DECLARE sql_args VARCHAR(1000);
+    DECLARE arg_name VARCHAR(50);
+    DECLARE arg_value VARCHAR(255);
+    DECLARE tester VARCHAR(255);
+    DECLARE done INT DEFAULT FALSE;
+
+    DECLARE cursor_parameter_names CURSOR FOR
+        SELECT DISTINCT (p.parameter_name)
+        FROM mamba_dim_report_definition_parameters p
+        WHERE p.report_id = report_identifier
+        AND p.parameter_name NOT IN ('page_number', 'page_size');
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    SET proc_name = (SELECT DISTINCT (rd.report_size_procedure_name)
+                         FROM mamba_dim_report_definition rd
+                         WHERE rd.report_id = report_identifier);
 
     OPEN cursor_parameter_names;
     read_loop:
@@ -9566,6 +9618,7 @@ CREATE TABLE mamba_dim_report_definition
     report_id                     VARCHAR(255) NOT NULL UNIQUE,
     report_procedure_name         VARCHAR(255) NOT NULL UNIQUE, -- should be derived from report_id??
     report_columns_procedure_name VARCHAR(255) NOT NULL UNIQUE,
+    report_size_procedure_name    VARCHAR(255) NULL UNIQUE,
     sql_query                     TEXT         NOT NULL,
     table_name                    VARCHAR(255) NOT NULL,        -- name of the table (will contain columns) of this query
     report_name                   VARCHAR(255) NULL,
